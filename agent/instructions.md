@@ -100,13 +100,9 @@ instructions.md (este archivo)
     ├── Estado del proyecto → /kanban.md
     ├── Historias de usuario → /stories/
     |   ├── Plantilla → /template.md
-    |   └── Nomenclatura → [Codigo] [Título].md
     └── Instrucciones específicas → /instructions/[temática].md
-        ├── Estructura → /structure.md
-        ├── Despliegue → /deployment.md
         ├── Estilo de codigo → /coding_style.md
-        ├── Testing → /testing.md
-        └── Workflow → /workflow.md
+
 ```
 
 ## **Filosofía del Proyecto**
