@@ -1,7 +1,7 @@
 # Instrucciones Generales del Proyecto
 
 ## **Propósito y Alcance**
-Plataforma digital integral para la gestión de remesas que permite al usuario maximizar el valor de sus envíos internacionales. Combina la monitorización en tiempo real del tipo de cambio con una interfaz de planificación logística que muestra la disponibilidad operativa en el país de destino (hora local y estado de la transacción), asegurando una sólida transparencia en la gestión
+Plataforma digital integral para la gestión de remesas que permite al usuario maximizar el valor de sus envíos internacionales. Combina la monitorización en tiempo real del tipo de cambio con una interfaz de planificación logística que muestra la disponibilidad operativa en el país de destino (hora local y estado de la transacción), asegurando una sólida transparencia en la gestión.
 
 ## **Normas de Comportamiento Esperado**
 
@@ -21,7 +21,7 @@ Plataforma digital integral para la gestión de remesas que permite al usuario m
 ### **Jerarquía de Autoridad:**
 ```
 1. Requerimientos del negocio (historias de usuario)
-2. Instrucciones técnicas específicas (/instructions/[área].md)
+2. Instrucciones técnicas específicas (/Project Context/coding_style.md)
 3. Mejores prácticas de la industria
 4. Preferencias del mantenedor humano
 ```
@@ -34,16 +34,16 @@ Plataforma digital integral para la gestión de remesas que permite al usuario m
 ## **Flujo de Trabajo Esperado**
 
 ### **Para cada tarea:**
-1. **Contextualizar** - Leer la historia de usuario relevante en `/stories/`
-2. **Verificar estado** - Revisar progreso en `/kanban.md`
-3. **Consultar instrucciones** - Leer los archivos pertinentes en `/instructions/`
+1. **Contextualizar** - Leer la historia de usuario relevante en `/US Context/`
+2. **Verificar estado** - Revisar progreso en `/Project Context/kanban.md`
+3. **Consultar instrucciones** - Leer los archivos pertinentes en `/Project Context/`
 4. **Planificar** - Planificar según las pautas
 5. **Validar** - Iterar la definición del plan hasta su validación por el humano
 6. **Ejecutar** - Implementar según el plan validado
 
 ### **Formato de entregables:**
 - **Código**: Comentado, testeado, siguiendo convenciones
-- **Documentación**: En Markdown, con ejemplos prácticos
+- **Documentación**: En Markdown, con ejemplos prácticos y almacenarla en `/src/__tests__/`
 - **Decisiones**: Justificadas con referencia a requisitos
 
 ## **Restricciones Críticas**
@@ -60,28 +60,9 @@ Plataforma digital integral para la gestión de remesas que permite al usuario m
 ### **Límites técnicos:**
 ## **Límites de Compatibilidad**
 - **Navegadores**: Chrome 90+, Firefox 88+, Safari 14+ (no soporte IE)
-<!-- Límites de ejemplo, no definidos
-- **Sistemas operativos**: Linux Ubuntu 20.04+, macOS 10.15+, Windows 10+
-- **Dispositivos móviles**: Responsive hasta 320px de ancho
-- **APIs externas**: Solo versión 2.x de [Nombre API], no migrar a v3
-- **Legado**: Mantener compatibilidad con archivos formato .legacy v1
---> 
-## Límites de Rendimiento
-- **Tiempo de carga**: < 3 segundos en conexión 3G
-- **Tamaño de bundle**: < 500KB inicial, < 2MB total
-<!-- Límites de ejemplo, no definidos
-- **Uso de memoria**: < 100MB en cliente, < 512MB en servidor
-- **Consultas a DB**: < 50ms por query en producción
-- **Concurrencia**: Soporte para 1000 usuarios simultáneos
--->
+
 ## Límites de Seguridad
 - **Dependencias**: Solo paquetes con auditoría de seguridad mensual
-<!-- Límites de ejemplo, no definidos
-- **Autenticación**: JWT con expiración de 24h máximo
-- **Contraseñas**: Hash bcrypt con salt de 10 rondas mínimo
-- **APIs**: Rate limiting de 100 requests/ip/minuto
-- **Datos sensibles**: Nunca loggear PII (emails, documentos)
--->
 
 ## **Cómo Usar esta Estructura**
 
@@ -96,13 +77,11 @@ Estas instrucciones están diseñadas para ser leídas por personas y ejecutadas
 ## **Relación con Otros Componentes**
 
 ```
-instructions.md (este archivo)
-    ├── Estado del proyecto → /kanban.md
-    ├── Historias de usuario → /stories/
-    |   ├── Plantilla → /template.md
-    └── Instrucciones específicas → /instructions/[temática].md
-        ├── Estilo de codigo → /coding_style.md
-
+project-context.md (este archivo)
+    ├── Estado del proyecto → project-context/kanban.md
+    ├── Historias de usuario → us-context/
+    └── Instrucciones específicas → project-context/instructions.md
+        ├── Estilo de codigo → project-context/coding_style.md
 ```
 
 ## **Filosofía del Proyecto**
@@ -110,6 +89,3 @@ instructions.md (este archivo)
 - **Colaborativo** - Humanos y IA trabajando complementariamente
 - **Pragmático** - Soluciones que funcionan hoy, escalan mañana
 - **Documentado** - El conocimiento debe ser explícito y accesible
-
-
-> **Nota para agentes**: Si alguna instrucción parece conflictiva o incompleta, pregunta antes de proceder. La comunicación clara previene errores costosos.
