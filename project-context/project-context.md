@@ -40,6 +40,7 @@ Plataforma digital integral para la gestión de remesas que permite al usuario m
 4. **Planificar** - Planificar según las pautas
 5. **Validar** - Iterar la definición del plan hasta su validación por el humano
 6. **Ejecutar** - Implementar según el plan validado
+7. **Documentar** - Documentar el código y la implementación en castellano
 
 ### **Formato de entregables:**
 - **Código**: Comentado, testeado, siguiendo convenciones
