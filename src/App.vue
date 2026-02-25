@@ -20,8 +20,8 @@ import { RouterLink, RouterView } from 'vue-router'
       </div>
       
       <div class="navbar-auth">
-        <a href="#" class="auth-link">Log In</a>
-        <a href="#" class="auth-button">Sign Up</a>
+        <RouterLink to="/login" class="auth-link">Log In</RouterLink>
+        <RouterLink to="/register" class="auth-button">Sign Up</RouterLink>
       </div>
     </nav>
 

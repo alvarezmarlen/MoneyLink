@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { CURRENCIES, DEFAULT_FROM_CURRENCY, DEFAULT_TO_CURRENCY } from '../constants/currencies'
+import { transferStorage } from '../services/authService'
 
 const router = useRouter()
 
@@ -42,6 +43,13 @@ const swapCurrencies = () => {
 }
 
 const executeTransfer = () => {
+  transferStorage.saveTransferData({
+    amount: amount.value,
+    fromCurrency: fromCurrency.value,
+    toCurrency: toCurrency.value,
+    convertedAmount: convertedAmount.value,
+    exchangeRate: exchangeRate.value
+  })
   router.push('/login')
 }
 
@@ -144,8 +152,10 @@ const timeAgo = computed(() => {
 
 <style scoped>
 .converter-card {
-  background: #0a1f1a;
-  border: 1px solid #1a2e29;
+  background: rgba(10, 31, 26, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(26, 46, 41, 0.8);
   border-radius: 16px;
   padding: 24px;
   max-width: 480px;
