@@ -23,8 +23,8 @@ const form = ref({
 const errors = ref({})
 const savedRecipients = ref([])
 
-onMounted(() => {
-  savedRecipients.value = recipientService.getRecipients()
+onMounted(async () => {
+  savedRecipients.value = await recipientService.getRecipients()
   
   if (props.initialData) {
     form.value = { ...props.initialData }
@@ -69,20 +69,25 @@ const validate = () => {
   return Object.keys(errors.value).length === 0
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!validate()) return
   
-  if (form.value.isFrequent) {
-    recipientService.saveRecipient({
-      fullName: form.value.fullName,
-      country: form.value.country,
-      accountNumber: form.value.accountNumber,
-      phone: form.value.phone,
-      email: form.value.email
-    })
+  try {
+    if (form.value.isFrequent) {
+      await recipientService.saveRecipient({
+        fullName: form.value.fullName,
+        country: form.value.country,
+        accountNumber: form.value.accountNumber,
+        phone: form.value.phone,
+        email: form.value.email
+      })
+    }
+    
+    emit('submit', { ...form.value })
+  } catch (error) {
+    console.error('Error in form submission:', error)
+    // Here you could add an error message property if needed
   }
-  
-  emit('submit', { ...form.value })
 }
 
 const selectRecipient = (recipient) => {

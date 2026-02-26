@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { CURRENCIES, DEFAULT_FROM_CURRENCY, DEFAULT_TO_CURRENCY } from '../constants/currencies'
-import { transferStorage } from '../services/authService'
+import { authService, transferStorage } from '../services/authService'
 
 const router = useRouter()
 
@@ -50,7 +50,12 @@ const executeTransfer = () => {
     convertedAmount: convertedAmount.value,
     exchangeRate: exchangeRate.value
   })
-  router.push('/login')
+  
+  if (authService.isAuthenticated()) {
+    router.push('/recipient')
+  } else {
+    router.push('/login')
+  }
 }
 
 const updateRate = () => {
