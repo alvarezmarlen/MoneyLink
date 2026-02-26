@@ -6,6 +6,8 @@ import RecipientView from '../views/RecipientView.vue'
 import SenderView from '../views/SenderView.vue'
 import PaymentView from '../views/PaymentView.vue'
 import DashboardView from '../views/DashboardView.vue'
+import ProfileView from '../views/ProfileView.vue'
+import EditRecipientView from '../views/EditRecipientView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,6 +55,16 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: DashboardView
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView
+    },
+    {
+      path: '/edit-recipient/:id',
+      name: 'edit-recipient',
+      component: EditRecipientView
     }
   ],
 })

@@ -1,29 +1,51 @@
 import { authService } from './authService'
 
 const API_URL = 'http://localhost:3000/recipients'
+const LOCAL_STORAGE_KEY = 'moneylink_recipients'
 
 export const recipientService = {
+  _getLocalRecipients() {
+    const user = authService.getCurrentUser()
+    if (!user) return []
+    
+    const data = localStorage.getItem(`${LOCAL_STORAGE_KEY}_${user.id}`)
+    return data ? JSON.parse(data) : []
+  },
+
+  _saveLocalRecipients(recipients) {
+    const user = authService.getCurrentUser()
+    if (!user) return
+    
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_${user.id}`, JSON.stringify(recipients))
+  },
+
   async getRecipients() {
     const user = authService.getCurrentUser()
     if (!user) return []
 
     try {
       const response = await fetch(`${API_URL}?userId=${user.id}`)
-      if (!response.ok) return []
+      if (!response.ok) {
+        return this._getLocalRecipients()
+      }
       return await response.json()
     } catch (error) {
-      console.error('Error fetching recipients:', error)
-      return []
+      console.warn('API no disponible, usando almacenamiento local')
+      return this._getLocalRecipients()
     }
   },
 
   async getRecipientById(id) {
     try {
       const response = await fetch(`${API_URL}/${id}`)
-      if (!response.ok) return null
+      if (!response.ok) {
+        const local = this._getLocalRecipients()
+        return local.find(r => r.id === id) || null
+      }
       return await response.json()
     } catch (error) {
-      return null
+      const local = this._getLocalRecipients()
+      return local.find(r => r.id === id) || null
     }
   },
 
@@ -31,7 +53,6 @@ export const recipientService = {
     const user = authService.getCurrentUser()
     if (!user) throw new Error('Usuario no autenticado')
 
-    // Buscar si ya existe uno con el mismo email para este usuario
     const recipients = await this.getRecipients()
     const existing = recipients.find(r => r.email === recipient.email)
 
@@ -48,6 +69,7 @@ export const recipientService = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...existing, ...data })
         })
+        if (!response.ok) throw new Error('API error')
         return await response.json()
       } else {
         const response = await fetch(API_URL, {
@@ -58,16 +80,81 @@ export const recipientService = {
             createdAt: new Date().toISOString()
           })
         })
+        if (!response.ok) throw new Error('API error')
         return await response.json()
       }
     } catch (error) {
-      console.error('Error saving recipient:', error)
-      throw new Error('No se pudo guardar el destinatario')
+      console.warn('API no disponible, guardando localmente')
+      const newRecipient = {
+        ...data,
+        id: String(Date.now()),
+        createdAt: new Date().toISOString()
+      }
+      
+      if (existing) {
+        const idx = recipients.findIndex(r => r.email === recipient.email)
+        recipients[idx] = { ...existing, ...newRecipient }
+      } else {
+        recipients.push(newRecipient)
+      }
+      
+      this._saveLocalRecipients(recipients)
+      return newRecipient
+    }
+  },
+
+  async updateRecipient(id, recipientData) {
+    const user = authService.getCurrentUser()
+    if (!user) throw new Error('Usuario no autenticado')
+
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...recipientData,
+          updatedAt: new Date().toISOString()
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('API error')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.warn('API no disponible, actualizando localmente')
+      const recipients = this._getLocalRecipients()
+      const idx = recipients.findIndex(r => r.id === id)
+      
+      if (idx >= 0) {
+        recipients[idx] = {
+          ...recipients[idx],
+          ...recipientData,
+          updatedAt: new Date().toISOString()
+        }
+        this._saveLocalRecipients(recipients)
+        return recipients[idx]
+      }
+      
+      throw new Error('Destinatario no encontrado')
     }
   },
 
   async deleteRecipient(id) {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+    const user = authService.getCurrentUser()
+    if (!user) return
+
+    try {
+      const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+      if (!response.ok) throw new Error('API error')
+    } catch (error) {
+      console.warn('API no disponible, eliminando localmente')
+    }
+    
+    const recipients = this._getLocalRecipients()
+    const filtered = recipients.filter(r => r.id !== id)
+    this._saveLocalRecipients(filtered)
   },
 
   validateRecipient(data) {

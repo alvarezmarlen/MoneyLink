@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService, transferStorage } from '../services/authService'
 import { recipientService } from '../services/recipientService'
@@ -14,8 +14,9 @@ const currentUser = ref(null)
 const currentTransaction = ref(null)
 const recentTransactions = ref([])
 const frequentRecipients = ref([])
+const isLoadingRecipients = ref(true)
 
-onMounted(() => {
+const loadData = async () => {
   if (!authService.isAuthenticated()) {
     router.push('/login')
     return
@@ -28,8 +29,22 @@ onMounted(() => {
     currentTransaction.value = transferData
   }
   
-  frequentRecipients.value = recipientService.getRecipients()
+  try {
+    frequentRecipients.value = await recipientService.getRecipients()
+  } catch (error) {
+    console.error('Error loading recipients:', error)
+    frequentRecipients.value = []
+  } finally {
+    isLoadingRecipients.value = false
+  }
+  
   recentTransactions.value = transactionService.getRecentTransactions(5)
+}
+
+onMounted(loadData)
+
+onActivated(() => {
+  loadData()
 })
 
 const greeting = computed(() => {
@@ -73,8 +88,29 @@ const handleRecipientSelect = (recipient) => {
   router.push('/sender')
 }
 
+const handleRecipientEdit = (recipient) => {
+  router.push(`/edit-recipient/${recipient.id}`)
+}
+
+const handleRecipientDelete = async (recipient) => {
+  const confirmed = confirm(`¿Estás seguro de eliminar a ${recipient.fullName} de tus destinatarios frecuentes?`)
+  
+  if (confirmed) {
+    try {
+      await recipientService.deleteRecipient(recipient.id)
+      frequentRecipients.value = await recipientService.getRecipients()
+    } catch (error) {
+      console.error('Error al eliminar destinatario:', error)
+    }
+  }
+}
+
 const handleTransactionSelect = (transaction) => {
   console.log('Ver detalle de transacción:', transaction.id)
+}
+
+const goToProfile = () => {
+  router.push('/profile')
 }
 
 const handleLogout = () => {
@@ -94,6 +130,10 @@ const handleLogout = () => {
         <button class="new-transfer-btn" @click="startNewTransfer">
           <span class="btn-icon">➕</span>
           Nueva Transferencia
+        </button>
+        <button class="profile-btn" @click="goToProfile">
+          <span class="btn-icon">👤</span>
+          Mi Perfil
         </button>
       </div>
     </div>
@@ -115,9 +155,15 @@ const handleLogout = () => {
           <span class="title-icon">⭐</span>
           Destinatarios Frecuentes
         </h2>
+        <div v-if="isLoadingRecipients" class="loading-indicator">
+          <span>Cargando...</span>
+        </div>
         <RecipientQuickList 
+          v-else
           :recipients="frequentRecipients"
           @select="handleRecipientSelect"
+          @edit="handleRecipientEdit"
+          @delete="handleRecipientDelete"
         />
       </section>
       
@@ -186,6 +232,26 @@ const handleLogout = () => {
 .new-transfer-btn:hover {
   background: #00C853;
   transform: translateY(-2px);
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: #A0A0A0;
+  border: 1px solid #1a2e29;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-btn:hover {
+  border-color: #00E676;
+  color: #00E676;
 }
 
 .btn-icon {
@@ -275,5 +341,11 @@ const handleLogout = () => {
   .dashboard-section {
     padding: 20px 16px;
   }
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 24px;
+  color: #5a6a65;
 }
 </style>
