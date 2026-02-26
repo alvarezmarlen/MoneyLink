@@ -1,53 +1,65 @@
 const STORAGE_KEY = 'moneylink_auth'
 const TRANSFER_DATA_KEY = 'moneylink_transfer_data'
-
-const MOCK_USERS = [
-  {
-    id: '1',
-    email: 'test@example.com',
-    password: 'password123',
-    fullName: 'Test User',
-    idNumber: '12345678'
-  }
-]
+const API_URL = 'http://localhost:3000/users'
 
 export const authService = {
   async login(email, password) {
-    await this.simulateDelay()
-    
-    const user = MOCK_USERS.find(u => u.email === email && u.password === password)
-    
+    // Buscar usuario por correo y contraseña
+    const response = await fetch(`${API_URL}?email=${email}&password=${password}`)
+
+    if (!response.ok) {
+      throw new Error('Error connecting to the server')
+    }
+
+    const users = await response.json()
+    const user = users[0] // json-server devuelve un array si se filtra
+
     if (!user) {
       throw new Error('Invalid credentials')
     }
-    
+
+    // Guardamos la sesión en localStorage (sin la contraseña)
     const { password: _, ...userWithoutPassword } = user
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword))
-    
+
     return userWithoutPassword
   },
 
   async register(userData) {
-    await this.simulateDelay()
-    
-    const exists = MOCK_USERS.find(u => u.email === userData.email)
-    if (exists) {
+    // 1. Verificar si el email ya existe
+    const checkResponse = await fetch(`${API_URL}?email=${userData.email}`)
+    const existingUsers = await checkResponse.json()
+
+    if (existingUsers.length > 0) {
       throw new Error('Email already exists')
     }
-    
+
+    // 2. Crear el nuevo usuario
     const newUser = {
-      id: String(MOCK_USERS.length + 1),
       email: userData.email,
       password: userData.password,
       fullName: userData.fullName,
       idNumber: userData.idNumber
     }
-    
-    MOCK_USERS.push(newUser)
-    
-    const { password: _, ...userWithoutPassword } = newUser
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newUser)
+    })
+
+    if (!response.ok) {
+      throw new Error('Could not create account at this time')
+    }
+
+    const createdUser = await response.json()
+
+    // 3. Guardar la sesión directamente al registrarse exitosamente
+    const { password: _, ...userWithoutPassword } = createdUser
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword))
-    
+
     return userWithoutPassword
   },
 
@@ -62,10 +74,6 @@ export const authService = {
 
   isAuthenticated() {
     return this.getCurrentUser() !== null
-  },
-
-  simulateDelay() {
-    return new Promise(resolve => setTimeout(resolve, 500))
   }
 }
 
