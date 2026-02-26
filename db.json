@@ -6,40 +6,7 @@
       "password": "password123",
       "fullName": "Test User",
       "idNumber": "12345678"
-    },
-    {
-      "id": "d9cd",
-      "email": "naia.arenaza88@gmail.com",
-      "password": "NaiaArenaza",
-      "fullName": "Naia Arenaza ",
-      "idNumber": "78928377J"
-    },
-    {
-      "id": "deaa",
-      "email": "newuser@test.com",
-      "password": "newpass123",
-      "fullName": "New User",
-      "idNumber": "9876543"
-    },
-    {
-      "id": "a463",
-      "email": "another@test.com",
-      "password": "pass12345",
-      "fullName": "Another User",
-      "idNumber": "5555555"
     }
   ],
-  "recipients": [
-    {
-      "id": "6ec8",
-      "fullName": "Gabriel",
-      "country": "AR",
-      "accountNumber": "sfhfgsdfgargrehergae",
-      "phone": "+34 659856321",
-      "email": "naia.arenaza88@gmail.com",
-      "userId": "d9cd",
-      "updatedAt": "2026-02-26T10:43:03.874Z",
-      "createdAt": "2026-02-26T10:43:03.875Z"
-    }
-  ]
+  "recipients": []
 }

@@ -157,13 +157,12 @@ const timeAgo = computed(() => {
 
 <style scoped>
 .converter-card {
-  background: rgba(10, 31, 26, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(10, 31, 26, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(26, 46, 41, 0.8);
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 480px;
+  border-radius: 24px;
+  padding: 32px;
   width: 100%;
   margin: 0 auto;
 }
@@ -172,29 +171,39 @@ const timeAgo = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .converter-header h2 {
-  color: #FFFFFF;
-  font-size: 1.5rem;
-  font-weight: 600;
+  color: #00E676;
+  font-size: 0.75rem;
+  font-weight: 700;
   margin: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.converter-header h2::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #00E676;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
 }
 
 .updated-indicator {
   color: #A0A0A0;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
 .updated-indicator:hover {
   color: #00E676;
-}
-
-.updated-indicator.loading {
-  opacity: 0.5;
 }
 
 .currency-row {
@@ -206,55 +215,56 @@ const timeAgo = computed(() => {
 .currency-input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .currency-input-group label {
   color: #A0A0A0;
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .input-wrapper {
-  background: #020b08;
-  border: 1px solid #1a2e29;
-  border-radius: 8px;
-  padding: 12px 16px;
+  background: rgba(2, 11, 8, 0.5);
+  border: 1px solid rgba(26, 46, 41, 1);
+  border-radius: 16px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  height: 72px;
 }
 
 .input-wrapper:focus-within {
   border-color: #00E676;
-  box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
 }
 
 .amount-input {
   background: transparent;
   border: none;
   color: #FFFFFF;
-  font-size: 1.25rem;
+  font-size: 1.75rem;
+  font-weight: 600;
   width: 100%;
   outline: none;
 }
 
-.amount-input::placeholder {
-  color: #A0A0A0;
-}
-
 .result-wrapper {
+  background: rgba(0, 230, 118, 0.05);
+  border-color: rgba(0, 230, 118, 0.2);
   gap: 8px;
 }
 
 .currency-symbol {
   color: #00E676;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .result-amount {
   color: #00E676;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
 .currency-select-group {
@@ -263,108 +273,88 @@ const timeAgo = computed(() => {
 
 .currency-select {
   width: 100%;
-  background: #020b08;
-  border: 1px solid #1a2e29;
-  border-radius: 8px;
+  background: #1a2e29;
+  border: 1px solid rgba(26, 46, 41, 0.8);
+  border-radius: 12px;
   padding: 12px 16px;
   color: #FFFFFF;
-  font-size: 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A0A0A0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300E676' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 16px center;
 }
 
-.currency-select:focus {
+.currency-select:hover {
   border-color: #00E676;
-  box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
-}
-
-.currency-select option {
-  background: #0a1f1a;
-  color: #FFFFFF;
+  background-color: #1f3a34;
 }
 
 .swap-button-container {
   display: flex;
   justify-content: center;
-  margin: 16px 0;
+  margin: -16px 0;
+  position: relative;
+  z-index: 2;
 }
 
 .swap-button {
-  background: #0a1f1a;
-  border: 1px solid #1a2e29;
+  background: #00E676;
+  border: none;
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #00E676;
-  transition: all 0.2s ease;
+  color: #020b08;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .swap-button:hover {
-  background: #00E676;
-  color: #000000;
-  transform: scale(1.05);
-}
-
-.swap-button:active {
-  transform: scale(0.95);
+  transform: scale(1.1) rotate(180deg);
+  box-shadow: 0 6px 16px rgba(0, 230, 118, 0.3);
 }
 
 .rate-display {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 0;
-  padding: 12px;
-  background: rgba(0, 230, 118, 0.05);
-  border-radius: 8px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(26, 46, 41, 0.6);
 }
 
 .rate-label {
   color: #A0A0A0;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .rate-value {
-  color: #00E676;
+  color: #FFFFFF;
   font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.rate-value:hover {
-  opacity: 0.8;
-}
-
-.error-message {
-  color: #ff4757;
-  font-size: 0.875rem;
-  margin: 12px 0;
-  padding: 8px;
-  background: rgba(255, 71, 87, 0.1);
-  border-radius: 8px;
 }
 
 .execute-button {
   width: 100%;
   background: #00E676;
-  color: #000000;
+  color: #020b08;
   border: none;
-  border-radius: 8px;
-  padding: 16px 24px;
+  border-radius: 12px;
+  padding: 18px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 8px;
+  margin-top: 24px;
 }
 
 .execute-button:hover {
@@ -372,25 +362,13 @@ const timeAgo = computed(() => {
   transform: translateY(-2px);
 }
 
-.execute-button:active {
-  transform: translateY(0);
-}
-
 @media (max-width: 480px) {
   .converter-card {
-    padding: 16px;
+    padding: 24px 20px;
   }
 
-  .converter-header h2 {
-    font-size: 1.25rem;
-  }
-
-  .amount-input {
-    font-size: 1.125rem;
-  }
-
-  .result-amount {
-    font-size: 1.25rem;
+  .amount-input, .result-amount {
+    font-size: 1.5rem;
   }
 }
 </style>
