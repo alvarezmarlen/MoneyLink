@@ -13,26 +13,51 @@ onMounted(() => {
     } else {
       router.push('/converter')
     }
+    return
+  }
+  
+  const transferData = transferStorage.getTransferData()
+  
+  if (transferData && transferData.step === 'complete') {
+    return
+  }
+  
+  if (!transferData || !transferData.amount) {
+    router.push('/converter')
+  } else if (!transferData.recipient) {
+    router.push('/recipient')
+  } else if (!transferData.sender) {
+    router.push('/sender')
+  } else if (!transferData.paymentMethod) {
+    router.push('/payment')
+  } else {
+    const updatedData = { ...transferData, step: 'complete' }
+    transferStorage.saveTransferData(updatedData)
   }
 })
+
+const startNewTransfer = () => {
+  transferStorage.clearTransferData()
+  router.push('/converter')
+}
 </script>
 
 <template>
   <div class="transfer-container">
     <div class="transfer-card">
       <div class="transfer-header">
-        <span class="icon">💰</span>
-        <h1>Transfer Confirmation</h1>
+        <span class="icon">✅</span>
+        <h1>Transferencia Completada</h1>
       </div>
       
       <div class="transfer-content">
-        <p>Transfer view coming soon...</p>
-        <p class="subtitle">This is where you'll confirm and execute your transfer.</p>
+        <p>Tu transferencia ha sido procesada exitosamente.</p>
+        <p class="subtitle">Recibirás un correo de confirmación en breve.</p>
       </div>
 
       <div class="transfer-actions">
-        <button @click="router.push('/converter')" class="back-button">
-          Back to Converter
+        <button @click="startNewTransfer" class="new-transfer-button">
+          Nueva Transferencia
         </button>
       </div>
     </div>
@@ -97,19 +122,20 @@ onMounted(() => {
   justify-content: center;
 }
 
-.back-button {
-  background: transparent;
-  border: 1px solid #1a2e29;
-  color: #A0A0A0;
+.new-transfer-button {
+  background: #00E676;
+  color: #000000;
+  border: none;
   border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 0.9375rem;
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.back-button:hover {
-  border-color: #00E676;
-  color: #00E676;
+.new-transfer-button:hover {
+  background: #00C853;
+  transform: translateY(-2px);
 }
 </style>

@@ -6,7 +6,16 @@
 ✅ Completed in previous session
 
 ### US-002: Authentication (TK-002-01 to TK-002-09)
-✅ Completed in current session
+✅ Completed in previous session
+
+### US-003: Proceso de envío de divisas (TK-003-01 a TK-003-07)
+✅ TK-003-01: Crear formulario para datos del destinatario y checkbox de destinatario frecuente
+✅ TK-003-02: Crear formulario para los datos del remitente
+✅ TK-003-03: Implementar apartado de selección de método de pago
+✅ TK-003-04: Desarrollar vista de resumen (montos, exchange, tarifas) y botón de continuar
+✅ TK-003-05: Lógica de validación de datos del destinatario y cálculo en tiempo real
+✅ TK-003-06: Crear test E2E para validar flujos de transferencia
+✅ TK-003-07: Crear test MCP para validar flujos de transferencia
 
 ---
 
