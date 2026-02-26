@@ -63,6 +63,43 @@ export const authService = {
     return userWithoutPassword
   },
 
+  async updateProfile(userData) {
+    const user = this.getCurrentUser()
+    if (!user) throw new Error('Usuario no autenticado')
+
+    const updatedData = {
+      ...user,
+      fullName: userData.fullName,
+      phone: userData.phone,
+      address: userData.address
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/${user.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedData)
+      })
+
+      if (!response.ok) {
+        throw new Error('No se pudo actualizar el perfil')
+      }
+
+      const updatedUser = await response.json()
+      
+      // Actualizar localStorage
+      const { password: _, ...userWithoutPassword } = updatedUser
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword))
+
+      return userWithoutPassword
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      throw new Error('No se pudo actualizar el perfil')
+    }
+  },
+
   logout() {
     localStorage.removeItem(STORAGE_KEY)
   },

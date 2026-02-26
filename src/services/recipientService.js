@@ -66,6 +66,31 @@ export const recipientService = {
     }
   },
 
+  async updateRecipient(id, recipientData) {
+    const user = authService.getCurrentUser()
+    if (!user) throw new Error('Usuario no autenticado')
+
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...recipientData,
+          updatedAt: new Date().toISOString()
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('No se pudo actualizar el destinatario')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error updating recipient:', error)
+      throw new Error('No se pudo actualizar el destinatario')
+    }
+  },
+
   async deleteRecipient(id) {
     await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
   },

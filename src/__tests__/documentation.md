@@ -26,6 +26,14 @@
 ✅ TK-004-06: Implementar navegación a flujo de nueva transacción
 ✅ TK-004-07: Pruebas funcionales y de integración
 
+### US-005: Edición y modificación de perfil (TK-005-01 a TK-005-08)
+✅ TK-005-01: Diseñar interfaz de edición de perfil
+✅ TK-005-02: Implementar servicio de actualización de perfil
+✅ TK-005-03: Implementar validaciones de datos del usuario
+✅ TK-005-04: Desarrollar vista de edición de perfil
+✅ TK-005-05: Implementar funcionalidad de edición de usuarios frecuentes
+✅ TK-005-06: Pruebas funcionales y de validación
+
 ---
 
 ## AuthView Component - Documentation

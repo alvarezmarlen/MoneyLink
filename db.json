@@ -13,6 +13,20 @@
       "password": "NaiaArenaza",
       "fullName": "Naia Arenaza ",
       "idNumber": "78928377J"
+    },
+    {
+      "id": "deaa",
+      "email": "newuser@test.com",
+      "password": "newpass123",
+      "fullName": "New User",
+      "idNumber": "9876543"
+    },
+    {
+      "id": "a463",
+      "email": "another@test.com",
+      "password": "pass12345",
+      "fullName": "Another User",
+      "idNumber": "5555555"
     }
   ],
   "recipients": [

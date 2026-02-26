@@ -73,8 +73,16 @@ const handleRecipientSelect = (recipient) => {
   router.push('/sender')
 }
 
+const handleRecipientEdit = (recipient) => {
+  router.push(`/edit-recipient/${recipient.id}`)
+}
+
 const handleTransactionSelect = (transaction) => {
   console.log('Ver detalle de transacción:', transaction.id)
+}
+
+const goToProfile = () => {
+  router.push('/profile')
 }
 
 const handleLogout = () => {
@@ -94,6 +102,10 @@ const handleLogout = () => {
         <button class="new-transfer-btn" @click="startNewTransfer">
           <span class="btn-icon">➕</span>
           Nueva Transferencia
+        </button>
+        <button class="profile-btn" @click="goToProfile">
+          <span class="btn-icon">👤</span>
+          Mi Perfil
         </button>
       </div>
     </div>
@@ -118,6 +130,7 @@ const handleLogout = () => {
         <RecipientQuickList 
           :recipients="frequentRecipients"
           @select="handleRecipientSelect"
+          @edit="handleRecipientEdit"
         />
       </section>
       
@@ -186,6 +199,26 @@ const handleLogout = () => {
 .new-transfer-btn:hover {
   background: #00C853;
   transform: translateY(-2px);
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: #A0A0A0;
+  border: 1px solid #1a2e29;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-btn:hover {
+  border-color: #00E676;
+  color: #00E676;
 }
 
 .btn-icon {

@@ -8,7 +8,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'edit'])
 
 const countryNames = {
   'CO': 'Colombia',
@@ -21,6 +21,15 @@ const countryNames = {
 }
 
 const getCountryName = (code) => countryNames[code] || code
+
+const handleSelect = (recipient) => {
+  emit('select', recipient)
+}
+
+const handleEdit = (recipient, event) => {
+  event.stopPropagation()
+  emit('edit', recipient)
+}
 </script>
 
 <template>
@@ -32,18 +41,21 @@ const getCountryName = (code) => countryNames[code] || code
     </div>
     
     <div v-else class="recipients-grid">
-      <button 
+      <div 
         v-for="recipient in recipients" 
         :key="recipient.id"
         class="recipient-chip"
-        @click="emit('select', recipient)"
+        @click="handleSelect(recipient)"
       >
         <span class="avatar">{{ recipient.fullName.charAt(0).toUpperCase() }}</span>
         <div class="recipient-info">
           <span class="name">{{ recipient.fullName }}</span>
           <span class="country">{{ getCountryName(recipient.country) }}</span>
         </div>
-      </button>
+        <button class="edit-btn" @click="handleEdit(recipient, $event)" title="Editar">
+          ✏️
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -93,6 +105,7 @@ const getCountryName = (code) => countryNames[code] || code
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 180px;
+  position: relative;
 }
 
 .recipient-chip:hover {
@@ -130,6 +143,29 @@ const getCountryName = (code) => countryNames[code] || code
 .country {
   color: #5a6a65;
   font-size: 0.75rem;
+}
+
+.edit-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(10, 31, 26, 0.8);
+  border: 1px solid #1a2e29;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.recipient-chip:hover .edit-btn {
+  opacity: 1;
+}
+
+.edit-btn:hover {
+  background: rgba(0, 230, 118, 0.2);
+  border-color: #00E676;
 }
 
 @media (max-width: 480px) {
