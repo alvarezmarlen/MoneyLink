@@ -80,13 +80,13 @@ const handleDelete = (recipient, event) => {
 }
 
 .empty-text {
-  color: #A0A0A0;
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   margin: 0 0 4px 0;
 }
 
 .empty-subtext {
-  color: #5a6a65;
+  color: var(--text-tertiary);
   font-size: 0.8125rem;
   margin: 0;
 }
@@ -101,8 +101,8 @@ const handleDelete = (recipient, event) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(10, 31, 26, 0.5);
-  border: 1px solid #1a2e29;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 12px 16px;
   cursor: pointer;
@@ -112,7 +112,7 @@ const handleDelete = (recipient, event) => {
 }
 
 .recipient-chip:hover {
-  border-color: #00E676;
+  border-color: var(--accent-color);
   background: rgba(0, 230, 118, 0.05);
   transform: translateY(-2px);
 }
@@ -138,13 +138,13 @@ const handleDelete = (recipient, event) => {
 }
 
 .name {
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-size: 0.9375rem;
   font-weight: 500;
 }
 
 .country {
-  color: #5a6a65;
+  color: var(--text-tertiary);
   font-size: 0.75rem;
 }
 

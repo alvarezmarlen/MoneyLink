@@ -7,8 +7,12 @@ import { transactionService } from '../services/transactionService'
 import TransactionCard from '../components/TransactionCard.vue'
 import HistoryList from '../components/HistoryList.vue'
 import RecipientQuickList from '../components/RecipientQuickList.vue'
+import { useExchangeChart } from '../composables/useExchangeChart'
 
 const router = useRouter()
+
+// Exchange chart composable
+const { chartCanvas, initChart, chartData } = useExchangeChart()
 
 const currentUser = ref(null)
 const currentTransaction = ref(null)
@@ -39,6 +43,34 @@ const loadData = async () => {
   }
   
   recentTransactions.value = transactionService.getRecentTransactions(5)
+  
+  // Initialize exchange rate chart
+  loadExchangeRateChart()
+}
+
+// Generate mock exchange rate data for demonstration
+const loadExchangeRateChart = () => {
+  const labels = []
+  const dataPoints = []
+  const baseRate = 0.92
+  
+  // Generate data for the last 30 days
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    labels.push(date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }))
+    
+    // Generate realistic mock data with slight variations
+    const variation = (Math.random() - 0.5) * 0.02
+    dataPoints.push(baseRate + variation)
+  }
+  
+  initChart(
+    labels,
+    dataPoints,
+    'Evolución USD/EUR - Últimos 30 días',
+    'USD/EUR'
+  )
 }
 
 onMounted(loadData)
@@ -139,6 +171,20 @@ const handleLogout = () => {
     </div>
     
     <div class="dashboard-content">
+      <!-- Exchange Rate Chart -->
+      <section class="dashboard-section chart-section">
+        <h2 class="section-title">
+          <span class="title-icon">📈</span>
+          Análisis de Tipo de Cambio
+        </h2>
+        <div class="chart-container">
+          <canvas ref="chartCanvas"></canvas>
+        </div>
+        <div v-if="chartData.hasError" class="chart-error">
+          Error al cargar el gráfico: {{ chartData.errorMessage }}
+        </div>
+      </section>
+      
       <section v-if="currentTransaction" class="dashboard-section current-tx">
         <h2 class="section-title">
           <span class="title-icon">⏳</span>
@@ -202,14 +248,14 @@ const handleLogout = () => {
 }
 
 .header-left h1 {
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-size: 1.75rem;
   font-weight: 600;
   margin: 0 0 4px 0;
 }
 
 .header-left .subtitle {
-  color: #A0A0A0;
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   margin: 0;
 }
@@ -218,7 +264,7 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #00E676;
+  background: var(--accent-color);
   color: #000000;
   border: none;
   border-radius: 10px;
@@ -230,7 +276,7 @@ const handleLogout = () => {
 }
 
 .new-transfer-btn:hover {
-  background: #00C853;
+  background: var(--accent-hover);
   transform: translateY(-2px);
 }
 
@@ -239,8 +285,8 @@ const handleLogout = () => {
   align-items: center;
   gap: 8px;
   background: transparent;
-  color: #A0A0A0;
-  border: 1px solid #1a2e29;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 12px 20px;
   font-size: 0.9375rem;
@@ -250,8 +296,8 @@ const handleLogout = () => {
 }
 
 .profile-btn:hover {
-  border-color: #00E676;
-  color: #00E676;
+  border-color: var(--accent-color);
+  color: var(--accent-color);
 }
 
 .btn-icon {
@@ -265,8 +311,8 @@ const handleLogout = () => {
 }
 
 .dashboard-section {
-  background: rgba(10, 31, 26, 0.4);
-  border: 1px solid #1a2e29;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
 }
@@ -275,7 +321,7 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 20px 0;
@@ -285,16 +331,41 @@ const handleLogout = () => {
   font-size: 1.25rem;
 }
 
+.chart-section {
+  background: var(--bg-secondary);
+}
+
+.chart-container {
+  width: 100%;
+  height: 320px;
+  position: relative;
+}
+
+.chart-container canvas {
+  max-height: 320px;
+}
+
+.chart-error {
+  padding: 16px;
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #ff4444;
+  margin-top: 16px;
+  font-size: 0.875rem;
+}
+
 .current-tx {
-  background: rgba(10, 31, 26, 0.6);
+  background: var(--bg-secondary);
+  border-color: var(--accent-color);
 }
 
 .recipients-section {
-  background: rgba(10, 31, 26, 0.3);
+  background: var(--bg-secondary);
 }
 
 .history-section {
-  background: rgba(10, 31, 26, 0.3);
+  background: var(--bg-secondary);
 }
 
 .dashboard-footer {
@@ -305,8 +376,8 @@ const handleLogout = () => {
 
 .logout-btn {
   background: transparent;
-  border: 1px solid #1a2e29;
-  color: #5a6a65;
+  border: 1px solid var(--border-color);
+  color: var(--text-tertiary);
   border-radius: 8px;
   padding: 10px 24px;
   font-size: 0.875rem;
@@ -346,6 +417,6 @@ const handleLogout = () => {
 .loading-indicator {
   text-align: center;
   padding: 24px;
-  color: #5a6a65;
+  color: var(--text-tertiary);
 }
 </style>

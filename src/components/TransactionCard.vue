@@ -70,9 +70,9 @@ const getCountryName = (code) => {
 
 <style scoped>
 .transaction-card {
-  background: rgba(10, 31, 26, 0.7);
+  background: var(--bg-secondary);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 230, 118, 0.3);
+  border: 1px solid var(--accent-color);
   border-radius: 16px;
   padding: 20px;
 }
@@ -86,7 +86,7 @@ const getCountryName = (code) => {
 
 .status-badge {
   background: rgba(0, 230, 118, 0.15);
-  color: #00E676;
+  color: var(--accent-color);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.75rem;
@@ -94,7 +94,7 @@ const getCountryName = (code) => {
 }
 
 .date {
-  color: #5a6a65;
+  color: var(--text-tertiary);
   font-size: 0.8125rem;
 }
 
@@ -119,24 +119,24 @@ const getCountryName = (code) => {
 }
 
 .label {
-  color: #5a6a65;
+  color: var(--text-tertiary);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .amount {
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-size: 1.25rem;
   font-weight: 600;
 }
 
 .amount.highlight {
-  color: #00E676;
+  color: var(--accent-color);
 }
 
 .arrow {
-  color: #00E676;
+  color: var(--accent-color);
   font-size: 1.5rem;
 }
 
@@ -146,20 +146,20 @@ const getCountryName = (code) => {
   justify-content: center;
   gap: 6px;
   padding-top: 12px;
-  border-top: 1px solid #1a2e29;
+  border-top: 1px solid var(--border-color);
 }
 
 .recipient-info .label {
-  color: #5a6a65;
+  color: var(--text-tertiary);
 }
 
 .recipient-info .name {
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .recipient-info .country {
-  color: #A0A0A0;
+  color: var(--text-secondary);
   font-size: 0.875rem;
 }
 
@@ -169,7 +169,7 @@ const getCountryName = (code) => {
 }
 
 .continue-btn {
-  background: #00E676;
+  background: var(--accent-color);
   color: #000000;
   border: none;
   border-radius: 8px;
@@ -181,7 +181,7 @@ const getCountryName = (code) => {
 }
 
 .continue-btn:hover {
-  background: #00C853;
+  background: var(--accent-hover);
   transform: translateY(-1px);
 }
 </style>

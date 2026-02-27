@@ -296,10 +296,10 @@ const subtitle = computed(() => isLogin.value ? 'Log in to continue your transfe
 }
 
 .auth-card {
-  background: rgba(10, 31, 26, 0.7);
+  background: var(--bg-secondary);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(26, 46, 41, 0.8);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 32px;
   width: 100%;
@@ -312,14 +312,14 @@ const subtitle = computed(() => isLogin.value ? 'Log in to continue your transfe
 }
 
 .auth-header h1 {
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-size: 1.75rem;
   font-weight: 600;
   margin: 0 0 8px 0;
 }
 
 .auth-header p {
-  color: #A0A0A0;
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   margin: 0;
 }
@@ -356,28 +356,28 @@ const subtitle = computed(() => isLogin.value ? 'Log in to continue your transfe
 }
 
 .form-group label {
-  color: #A0A0A0;
+  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
 }
 
 .form-group input {
-  background: #020b08;
-  border: 1px solid #1a2e29;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   padding: 12px 16px;
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-group input::placeholder {
-  color: #5a6a65;
+  color: var(--text-tertiary);
 }
 
 .form-group input:focus {
-  border-color: #00E676;
+  border-color: var(--accent-color);
   box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
 }
 
@@ -391,7 +391,7 @@ const subtitle = computed(() => isLogin.value ? 'Log in to continue your transfe
 }
 
 .submit-button {
-  background: #00E676;
+  background: var(--accent-color);
   color: #000000;
   border: none;
   border-radius: 8px;
@@ -404,7 +404,7 @@ const subtitle = computed(() => isLogin.value ? 'Log in to continue your transfe
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #00C853;
+  background: var(--accent-hover);
   transform: translateY(-2px);
 }
 
@@ -419,7 +419,7 @@ const subtitle = computed(() => isLogin.value ? 'Log in to continue your transfe
 }
 
 .auth-footer p {
-  color: #A0A0A0;
+  color: var(--text-secondary);
   font-size: 0.875rem;
   margin: 0;
 }
@@ -427,7 +427,7 @@ const subtitle = computed(() => isLogin.value ? 'Log in to continue your transfe
 .link-button {
   background: none;
   border: none;
-  color: #00E676;
+  color: var(--accent-color);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -435,26 +435,26 @@ const subtitle = computed(() => isLogin.value ? 'Log in to continue your transfe
 }
 
 .link-button:hover {
-  color: #00C853;
+  color: var(--accent-hover);
 }
 
 .transfer-preview {
   margin-top: 20px;
   padding: 12px;
   background: rgba(0, 230, 118, 0.05);
-  border: 1px solid #1a2e29;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   text-align: center;
 }
 
 .transfer-preview p {
-  color: #A0A0A0;
+  color: var(--text-secondary);
   font-size: 0.75rem;
   margin: 0 0 4px 0;
 }
 
 .transfer-preview span {
-  color: #00E676;
+  color: var(--accent-color);
   font-size: 0.875rem;
   font-weight: 500;
 }
