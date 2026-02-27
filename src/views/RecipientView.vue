@@ -49,24 +49,24 @@ const getCountryName = (code) => {
     <div class="recipient-card">
       <div class="recipient-header">
         <span class="step-icon">👤</span>
-        <h1>Datos del Destinatario</h1>
-        <p class="subtitle">Ingresa la información de quien recibirá el dinero</p>
+        <h1>Recipient Details</h1>
+        <p class="subtitle">Enter the information of the person who will receive the money</p>
       </div>
 
       <div class="steps-indicator">
         <div class="step" :class="{ active: currentStep >= 1, completed: currentStep > 1 }">
           <span class="step-number">1</span>
-          <span class="step-label">Destinatario</span>
+          <span class="step-label">Recipient</span>
         </div>
         <div class="step-line" :class="{ active: currentStep > 1 }"></div>
         <div class="step" :class="{ active: currentStep >= 2, completed: currentStep > 2 }">
           <span class="step-number">2</span>
-          <span class="step-label">Remitente</span>
+          <span class="step-label">Sender</span>
         </div>
         <div class="step-line" :class="{ active: currentStep > 2 }"></div>
         <div class="step" :class="{ active: currentStep >= 3 }">
           <span class="step-number">3</span>
-          <span class="step-label">Pago</span>
+          <span class="step-label">Payment</span>
         </div>
       </div>
 
@@ -79,12 +79,12 @@ const getCountryName = (code) => {
 
       <div v-if="transferData" class="transfer-summary">
         <div class="summary-item">
-          <span class="summary-label">Monto a enviar</span>
+          <span class="summary-label">Amount to send</span>
           <span class="summary-value">{{ transferData.amount }} {{ transferData.fromCurrency }}</span>
         </div>
         <div class="summary-arrow">→</div>
         <div class="summary-item">
-          <span class="summary-label">Recibirá</span>
+          <span class="summary-label">Recipient receives</span>
           <span class="summary-value highlight">{{ transferData.convertedAmount }} {{ transferData.toCurrency }}</span>
         </div>
       </div>

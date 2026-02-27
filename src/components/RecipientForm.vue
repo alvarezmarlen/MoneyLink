@@ -44,25 +44,25 @@ const validate = () => {
   errors.value = {}
   
   if (!form.value.fullName || form.value.fullName.length < 2) {
-    errors.value.fullName = 'El nombre debe tener al menos 2 caracteres'
+    errors.value.fullName = 'Name must be at least 2 characters long'
   }
   
   if (!form.value.country) {
-    errors.value.country = 'Selecciona un país'
+    errors.value.country = 'Select a country'
   }
   
   if (!form.value.accountNumber) {
-    errors.value.accountNumber = 'El número de cuenta es requerido'
+    errors.value.accountNumber = 'Account number is required'
   }
   
   if (!form.value.phone) {
-    errors.value.phone = 'El teléfono es requerido'
+    errors.value.phone = 'Phone number is required'
   } else if (!/^\+?[\d\s-]{8,}$/.test(form.value.phone)) {
-    errors.value.phone = 'Formato de teléfono inválido'
+    errors.value.phone = 'Invalid phone format'
   }
   
   if (form.value.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
-    errors.value.email = 'Formato de email inválido'
+    errors.value.email = 'Invalid email format'
   }
   
   return Object.keys(errors.value).length === 0
@@ -101,7 +101,7 @@ const selectRecipient = (recipient) => {
 <template>
   <form @submit.prevent="handleSubmit" class="recipient-form">
     <div v-if="savedRecipients.length > 0" class="frequent-section">
-      <label class="section-label">Destinatarios Guardados</label>
+      <label class="section-label">Saved Recipients</label>
       <div class="frequent-list">
         <button 
           v-for="recipient in savedRecipients" 
@@ -116,25 +116,25 @@ const selectRecipient = (recipient) => {
     </div>
 
     <div class="form-group">
-      <label for="recipient-name">Nombre Completo</label>
+      <label for="recipient-name">Full Name</label>
       <input
         id="recipient-name"
         v-model="form.fullName"
         type="text"
-        placeholder="Ingresa el nombre del destinatario"
+        placeholder="Enter recipient full name"
         :class="{ 'input-error': errors.fullName }"
       />
       <span v-if="errors.fullName" class="error-text">{{ errors.fullName }}</span>
     </div>
 
     <div class="form-group">
-      <label for="recipient-country">País de Destino</label>
+      <label for="recipient-country">Destination Country</label>
       <select
         id="recipient-country"
         v-model="form.country"
         :class="{ 'input-error': errors.country }"
       >
-        <option value="">Selecciona un país</option>
+        <option value="">Select a country</option>
         <option v-for="country in countries" :key="country.code" :value="country.code">
           {{ country.flag }} {{ country.name }} ({{ country.currency }})
         </option>
@@ -143,19 +143,19 @@ const selectRecipient = (recipient) => {
     </div>
 
     <div class="form-group">
-      <label for="recipient-account">Número de Cuenta / IBAN</label>
+      <label for="recipient-account">Account Number / IBAN</label>
       <input
         id="recipient-account"
         v-model="form.accountNumber"
         type="text"
-        placeholder="Ingresa el número de cuenta"
+        placeholder="Enter account number"
         :class="{ 'input-error': errors.accountNumber }"
       />
       <span v-if="errors.accountNumber" class="error-text">{{ errors.accountNumber }}</span>
     </div>
 
     <div class="form-group">
-      <label for="recipient-phone">Teléfono</label>
+      <label for="recipient-phone">Phone Number</label>
       <input
         id="recipient-phone"
         v-model="form.phone"
@@ -167,12 +167,12 @@ const selectRecipient = (recipient) => {
     </div>
 
     <div class="form-group">
-      <label for="recipient-email">Email (Opcional)</label>
+      <label for="recipient-email">Email (Optional)</label>
       <input
         id="recipient-email"
         v-model="form.email"
         type="email"
-        placeholder="email@ejemplo.com"
+        placeholder="email@example.com"
         :class="{ 'input-error': errors.email }"
       />
       <span v-if="errors.email" class="error-text">{{ errors.email }}</span>
@@ -185,16 +185,16 @@ const selectRecipient = (recipient) => {
           v-model="form.isFrequent"
         />
         <span class="checkmark"></span>
-        <span class="checkbox-text">Guardar como destinatario frecuente</span>
+        <span class="checkbox-text">Save as frequent recipient</span>
       </label>
     </div>
 
     <div class="form-actions">
       <button type="button" class="cancel-button" @click="emit('cancel')">
-        Cancelar
+        Cancel
       </button>
       <button type="submit" class="submit-button">
-        Continuar
+        Continue
       </button>
     </div>
   </form>
