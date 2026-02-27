@@ -1,5 +1,228 @@
 <script setup>
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import Chart from 'chart.js/auto'
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js'
 import CurrencyConverter from '../components/CurrencyConverter.vue'
+import { useExchangeChartAI } from '../composables/useExchangeChartAI'
+
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Title,
+  Tooltip,
+  Legend
+)
+
+const chartCanvas = ref(null)
+let chartInstance = null
+
+const labels = ref([])
+const dataPoints = ref([])
+const currentCurrencyPair = ref('USD/EUR')
+
+const { aiResponse, isLoading: aiLoading, error: aiError, analyzeExchangeRate } = useExchangeChartAI()
+
+const generateHistoricalData = () => {
+  const newLabels = []
+  const newData = []
+  const baseRate = currentCurrencyPair.value === 'USD/EUR' ? 0.92 : 
+                   currentCurrencyPair.value === 'USD/GBP' ? 0.79 : 1.35
+  
+  const now = new Date()
+  
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(now)
+    date.setDate(date.getDate() - i)
+    newLabels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
+    
+    const randomChange = (Math.random() - 0.5) * 0.02
+    const trendFactor = (30 - i) * 0.0003
+    newData.push((baseRate + randomChange + trendFactor).toFixed(4))
+  }
+  
+  labels.value = newLabels
+  dataPoints.value = newData.map(Number)
+}
+
+const initChart = () => {
+  if (!chartCanvas.value) return
+  
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
+  
+  const ctx = chartCanvas.value.getContext('2d')
+  
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels.value,
+      datasets: [{
+        label: currentCurrencyPair.value,
+        data: dataPoints.value,
+        borderColor: '#00E676',
+        backgroundColor: 'rgba(0, 230, 118, 0.05)',
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: '#00E676',
+        pointBorderColor: '#0a1f1a',
+        pointBorderWidth: 2,
+        pointHoverRadius: 6,
+        tension: 0.3,
+        fill: true,
+        spanGaps: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Exchange Rate - Last 30 Days',
+          color: '#FFFFFF',
+          font: {
+            size: 16,
+            weight: 'bold'
+          },
+          padding: {
+            bottom: 15
+          }
+        },
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            color: '#A0A0A0',
+            usePointStyle: true,
+            padding: 15,
+            font: {
+              size: 12
+            }
+          }
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          cornerRadius: 4,
+          callbacks: {
+            label: function(context) {
+              return `${context.dataset.label}: ${context.parsed.y.toFixed(4)}`
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(200, 200, 200, 0.1)',
+            drawBorder: true
+          },
+          ticks: {
+            color: '#A0A0A0',
+            callback: function(value) {
+              return value.toFixed(4)
+            }
+          }
+        },
+        x: {
+          type: 'category',
+          display: true,
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#A0A0A0'
+          }
+        }
+      }
+    }
+  })
+}
+
+const updateChartData = () => {
+  if (!chartInstance) return
+  
+  const lastValue = dataPoints.value[dataPoints.value.length - 1]
+  const newValue = lastValue + (Math.random() - 0.5) * 0.005
+  
+  dataPoints.value.shift()
+  dataPoints.value.push(Number(newValue.toFixed(4)))
+  
+  const now = new Date()
+  const newLabel = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+  labels.value.shift()
+  labels.value.push(newLabel)
+  
+  chartInstance.data.labels = labels.value
+  chartInstance.data.datasets[0].data = dataPoints.value
+  chartInstance.update('active')
+}
+
+let updateInterval = null
+
+const startRealTimeUpdates = () => {
+  updateInterval = setInterval(() => {
+    updateChartData()
+  }, 5000)
+}
+
+const runAIAnalysis = () => {
+  analyzeExchangeRate(labels.value, dataPoints.value, currentCurrencyPair.value)
+}
+
+onMounted(() => {
+  generateHistoricalData()
+  setTimeout(() => {
+    initChart()
+    startRealTimeUpdates()
+    runAIAnalysis()
+  }, 100)
+})
+
+onUnmounted(() => {
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
+  if (updateInterval) {
+    clearInterval(updateInterval)
+  }
+})
+
+const currentRate = computed(() => {
+  if (dataPoints.value.length === 0) return '0.0000'
+  return dataPoints.value[dataPoints.value.length - 1].toFixed(4)
+})
+
+const rateChange = computed(() => {
+  if (dataPoints.value.length < 2) return 0
+  const current = dataPoints.value[dataPoints.value.length - 1]
+  const previous = dataPoints.value[dataPoints.value.length - 2]
+  return ((current - previous) / previous * 100).toFixed(2)
+})
+
+const isPositiveChange = computed(() => {
+  return parseFloat(rateChange.value) >= 0
+})
 </script>
 
 <template>
@@ -13,14 +236,51 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
     </div>
 
     <div class="converter-grid">
-      <!-- Left Column -->
       <div class="left-column">
         <CurrencyConverter />
+        
+        <div class="chart-section">
+          <div class="chart-header">
+            <div class="rate-info">
+              <span class="current-rate-label">Current Rate</span>
+              <span class="current-rate-value">{{ currentRate }} {{ currentCurrencyPair.split('/')[1] }}</span>
+              <span class="rate-change" :class="{ positive: isPositiveChange, negative: !isPositiveChange }">
+                {{ isPositiveChange ? '↑' : '↓' }} {{ rateChange }}%
+              </span>
+            </div>
+            <button class="analyze-btn" @click="runAIAnalysis" :disabled="aiLoading">
+              {{ aiLoading ? 'Analyzing...' : 'Analyze Market' }}
+            </button>
+          </div>
+          
+          <div class="chart-container">
+            <canvas ref="chartCanvas"></canvas>
+          </div>
+          
+          <div class="ai-insight-section">
+            <div class="ai-question">
+              <span class="question-icon">🤔</span>
+              <h3>Is this a good time to send money?</h3>
+            </div>
+            
+            <div class="ai-response" v-if="aiResponse">
+              <div class="response-loading" v-if="aiLoading">
+                <span class="loading-spinner"></span>
+                <p>Analyzing market data...</p>
+              </div>
+              <div class="response-content" v-else>
+                <p>{{ aiResponse }}</p>
+              </div>
+            </div>
+            
+            <div class="ai-error" v-else-if="aiError">
+              <p>{{ aiError }}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Right Column -->
       <div class="right-column">
-        <!-- Analyst Note -->
         <div class="analyst-note">
            <div class="note-icon"></div>
            <div class="note-content">
@@ -29,7 +289,6 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
            </div>
         </div>
 
-        <!-- Trust Stats -->
         <div class="trust-stats">
            <div class="trust-box">
              <span class="trust-value">4.9/5</span>
@@ -41,7 +300,6 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
            </div>
         </div>
         
-        <!-- Market Status Info -->
         <div class="market-info-card">
            <div class="info-header">
              <span class="status-dot"></span>
@@ -52,7 +310,6 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
       </div>
     </div>
 
-    <!-- Features Section -->
     <div class="features-grid">
       <div class="feature-item">
         <h4>Instant Settlement</h4>
@@ -68,7 +325,6 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
       </div>
     </div>
 
-    <!-- Site Footer -->
     <footer class="site-footer">
       <div class="footer-left">
         <div class="footer-logo">
@@ -142,6 +398,154 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.chart-section {
+  background: rgba(10, 31, 26, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(26, 46, 41, 0.8);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.rate-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.current-rate-label {
+  color: #A0A0A0;
+  font-size: 0.875rem;
+}
+
+.current-rate-value {
+  color: #FFFFFF;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.rate-change {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.rate-change.positive {
+  color: #00E676;
+  background: rgba(0, 230, 118, 0.1);
+}
+
+.rate-change.negative {
+  color: #ff6b7a;
+  background: rgba(255, 107, 122, 0.1);
+}
+
+.analyze-btn {
+  background: transparent;
+  border: 1px solid #00E676;
+  color: #00E676;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  background: #00E676;
+  color: #000000;
+}
+
+.analyze-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chart-container {
+  background: rgba(2, 11, 8, 0.5);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  height: 280px;
+}
+
+.ai-insight-section {
+  background: rgba(2, 11, 8, 0.5);
+  border: 1px solid #1a2e29;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.ai-question {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.question-icon {
+  font-size: 1.5rem;
+}
+
+.ai-question h3 {
+  color: #FFFFFF;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ai-response {
+  min-height: 60px;
+}
+
+.response-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #A0A0A0;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #1a2e29;
+  border-top-color: #00E676;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.response-content {
+  background: rgba(0, 230, 118, 0.05);
+  border: 1px solid rgba(0, 230, 118, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.response-content p {
+  color: #FFFFFF;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ai-error {
+  color: #ff6b7a;
+  font-size: 0.875rem;
 }
 
 .analyst-note {
@@ -308,6 +712,16 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
     flex-direction: column;
     gap: 24px;
     text-align: center;
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .rate-info {
+    flex-wrap: wrap;
   }
 }
 </style>
