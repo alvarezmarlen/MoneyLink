@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { authService, transferStorage } from '../services/authService'
 
@@ -30,8 +30,20 @@ const errors = ref({})
 
 const transferData = ref(null)
 
+const checkRoute = () => {
+  isLogin.value = route.path === '/login'
+}
+
 onMounted(() => {
   transferData.value = transferStorage.getTransferData()
+  checkRoute()
+})
+
+watch(() => route.path, () => {
+  checkRoute()
+  error.value = null
+  successMessage.value = null
+  errors.value = {}
 })
 
 const validateEmail = (email) => {
@@ -107,6 +119,7 @@ const handleLogin = async () => {
     
     setTimeout(() => {
       // Redirigir a la vista de destinatario para continuar con el envío
+      emit('auth-change')
       router.push('/recipient')
     }, 500)
   } catch (e) {
@@ -135,6 +148,7 @@ const handleRegister = async () => {
     
     setTimeout(() => {
       // Redirigir a la vista de destinatario para continuar con el envío
+      emit('auth-change')
       router.push('/recipient')
     }, 500)
   } catch (e) {
@@ -145,10 +159,8 @@ const handleRegister = async () => {
 }
 
 const toggleMode = () => {
-  isLogin.value = !isLogin.value
-  error.value = null
-  successMessage.value = null
-  errors.value = {}
+  const newPath = isLogin.value ? '/register' : '/login'
+  router.push(newPath)
 }
 
 const title = computed(() => isLogin.value ? 'Welcome Back' : 'Create Account')

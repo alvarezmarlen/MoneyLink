@@ -8,6 +8,49 @@
       "idNumber": "12345678"
     }
   ],
-  "recipients": [],
-  "transactions": []
+  "recipients": [
+    {
+      "id": "33aa",
+      "fullName": "Gabriel Hernandez",
+      "country": "BRL",
+      "accountNumber": "324233453546567",
+      "phone": "7567567575",
+      "email": "hernandezcruz.gabrielosmin@gmail.com",
+      "isFrequent": true,
+      "userId": "1",
+      "updatedAt": "2026-03-01T22:20:03.911Z",
+      "createdAt": "2026-03-01T22:20:03.923Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "1772403613211",
+      "recipient": {
+        "fullName": "Gabriel Hernandez",
+        "country": "BRL",
+        "accountNumber": "324233453546567",
+        "phone": "7567567575",
+        "email": "hernandezcruz.gabrielosmin@gmail.com",
+        "isFrequent": true
+      },
+      "step": "payment",
+      "sender": {
+        "fullName": "Test User",
+        "idNumber": "12345678",
+        "phone": "67576757675",
+        "email": "test@example.com",
+        "address": ""
+      },
+      "paymentMethod": "paypal",
+      "paymentData": {
+        "method": "paypal",
+        "paypalEmail": "57657567657@4353"
+      },
+      "status": "completed",
+      "userId": "1",
+      "amount": null,
+      "convertedAmount": null,
+      "createdAt": "2026-03-01T22:20:13.211Z"
+    }
+  ]
 }
