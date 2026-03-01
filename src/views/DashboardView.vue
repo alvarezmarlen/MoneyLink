@@ -30,7 +30,7 @@ const loadData = async () => {
   }
   
   try {
-    frequentRecipients.value = await recipientService.getRecipients()
+    frequentRecipients.value = await recipientService.getRecipients(true)
   } catch (error) {
     console.error('Error loading recipients:', error)
     frequentRecipients.value = []
@@ -38,7 +38,12 @@ const loadData = async () => {
     isLoadingRecipients.value = false
   }
   
-  recentTransactions.value = transactionService.getRecentTransactions(5)
+  try {
+    recentTransactions.value = await transactionService.getRecentTransactions(5)
+  } catch (error) {
+    console.error('Error loading transactions:', error)
+    recentTransactions.value = []
+  }
 }
 
 onMounted(loadData)

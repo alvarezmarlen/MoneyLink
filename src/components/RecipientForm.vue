@@ -78,7 +78,8 @@ const handleSubmit = async () => {
         country: form.value.country,
         accountNumber: form.value.accountNumber,
         phone: form.value.phone,
-        email: form.value.email
+        email: form.value.email,
+        isFrequent: true
       })
     }
     
@@ -95,6 +96,7 @@ const selectRecipient = (recipient) => {
   form.value.accountNumber = recipient.accountNumber
   form.value.phone = recipient.phone
   form.value.email = recipient.email
+  form.value.isFrequent = recipient.isFrequent || false
 }
 </script>
 
