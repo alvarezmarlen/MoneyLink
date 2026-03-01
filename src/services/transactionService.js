@@ -11,7 +11,6 @@ export const transactionService = {
 
   _saveLocalTransaction(userId, transaction) {
     const transactions = this._getLocalTransactions(userId)
-    // Evitar duplicados
     if (!transactions.find(t => t.id === transaction.id)) {
       transactions.unshift(transaction)
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_${userId}`, JSON.stringify(transactions))
@@ -23,26 +22,31 @@ export const transactionService = {
     if (!user) return []
 
     try {
-      // Intentamos obtener de la API filtrando por userId (convertido a string para seguridad)
       const response = await fetch(`${API_URL}?userId=${String(user.id)}`)
       if (!response.ok) throw new Error('API unstable')
 
       const apiTransactions = await response.json()
 
-      // Combinar con locales para asegurar que no falte nada recién creado
+      // Filtrar transacciones corruptas (sin monto o sin divisas)
+      const validApiTx = apiTransactions.filter(t => t.amount !== null && t.fromCurrency && t.toCurrency)
+
       const localTransactions = this._getLocalTransactions(user.id)
-      const combined = [...apiTransactions]
+      const combined = [...validApiTx]
 
       localTransactions.forEach(lt => {
         if (!combined.find(at => at.id === lt.id)) {
-          combined.push(lt)
+          if (lt.amount !== null && lt.fromCurrency && lt.toCurrency) {
+            combined.push(lt)
+          }
         }
       })
 
       return combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     } catch (error) {
       console.warn('Usando respaldo local para el historial')
-      return this._getLocalTransactions(user.id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      return this._getLocalTransactions(user.id)
+        .filter(t => t.amount !== null && t.fromCurrency && t.toCurrency)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     }
   },
 
@@ -50,16 +54,21 @@ export const transactionService = {
     const user = authService.getCurrentUser()
     if (!user) throw new Error('Usuario no autenticado')
 
+    // Validar datos mínimos antes de intentar guardar
+    if (!transaction.amount || !transaction.fromCurrency || !transaction.toCurrency) {
+      console.warn('Evitando guardar transaccion incompleta:', transaction)
+      return null
+    }
+
     const newTransaction = {
       ...transaction,
-      userId: String(user.id), // Forzar ID como string para json-server
+      userId: String(user.id),
       amount: Number(transaction.amount),
       convertedAmount: Number(transaction.convertedAmount),
       createdAt: transaction.createdAt || new Date().toISOString(),
       status: 'completed'
     }
 
-    // Guardar localmente primero (feedback instantáneo)
     this._saveLocalTransaction(user.id, newTransaction)
 
     try {
@@ -68,10 +77,10 @@ export const transactionService = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newTransaction)
       })
-      if (!response.ok) throw new Error('API error during save')
+      if (!response.ok) throw new Error('API error')
       return await response.json()
     } catch (error) {
-      console.warn('Transacción guardada solo localmente por ahora')
+      console.warn('Transacción guardada solo localmente')
       return newTransaction
     }
   },
