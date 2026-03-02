@@ -13,10 +13,7 @@ import {
 } from 'chart.js'
 import currencyService from '../services/currencyService'
 import { CURRENCIES } from '../constants/currencies'
-<<<<<<< HEAD
-=======
 import { useExchangeChartAI } from '../composables/useExchangeChartAI'
->>>>>>> 8de22d8c10544e7a76b782973d27bcc40a1ef442
 
 ChartJS.register(
   LineElement,
@@ -40,15 +37,12 @@ const toCurrency = ref('EUR')
 const isLoading = ref(false)
 const isChartLoading = ref(true)
 
-<<<<<<< HEAD
-=======
 const { aiResponse, isLoading: aiLoading, error: aiError, analyzeExchangeRate } = useExchangeChartAI()
 
 const runAIAnalysis = () => {
   analyzeExchangeRate(labels.value, dataPoints.value, currentCurrencyPair.value)
 }
 
->>>>>>> 8de22d8c10544e7a76b782973d27bcc40a1ef442
 const isPositiveChange = computed(() => {
   if (dataPoints.value.length < 2) return true
   const current = dataPoints.value[dataPoints.value.length - 1]
@@ -208,18 +202,6 @@ const updateChartData = () => {
 }
 
 const handleCurrencyChange = () => {
-<<<<<<< HEAD
-  if (fromCurrency.value === toCurrency.value) {
-    if (fromCurrency.value === 'USD') {
-      toCurrency.value = 'EUR'
-    } else {
-      toCurrency.value = 'USD'
-    }
-  }
-  fetchHistoricalData()
-}
-
-=======
   fetchHistoricalData()
 }
 
@@ -233,7 +215,6 @@ const swapCurrencies = () => {
   })
 }
 
->>>>>>> 8de22d8c10544e7a76b782973d27bcc40a1ef442
 const refreshData = () => {
   fetchHistoricalData().then(() => {
     initChart()
@@ -291,11 +272,7 @@ const startRealTimeUpdates = () => {
             </div>
 
             <div class="swap-button-container">
-<<<<<<< HEAD
-              <button class="swap-button" @click="handleCurrencyChange" title="Swap currencies">
-=======
               <button class="swap-button" @click="swapCurrencies" title="Swap currencies">
->>>>>>> 8de22d8c10544e7a76b782973d27bcc40a1ef442
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="17 1 21 5 17 9"></polyline>
                   <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -368,8 +345,6 @@ const startRealTimeUpdates = () => {
           </div>
         </div>
 
-<<<<<<< HEAD
-=======
         <div class="ai-advisor-card">
           <div class="ai-header">
             <span class="ai-icon">✨</span>
@@ -393,7 +368,6 @@ const startRealTimeUpdates = () => {
           </div>
         </div>
 
->>>>>>> 8de22d8c10544e7a76b782973d27bcc40a1ef442
         <div class="trust-stats">
           <div class="trust-box">
             <span class="trust-value">4.9/5</span>
@@ -663,8 +637,6 @@ const startRealTimeUpdates = () => {
   color: #ff6b7a;
 }
 
-<<<<<<< HEAD
-=======
 .ai-advisor-card {
   background: rgba(0, 230, 118, 0.05);
   border: 1px solid rgba(0, 230, 118, 0.2);
@@ -744,7 +716,6 @@ const startRealTimeUpdates = () => {
   font-style: italic;
 }
 
->>>>>>> 8de22d8c10544e7a76b782973d27bcc40a1ef442
 .trust-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;

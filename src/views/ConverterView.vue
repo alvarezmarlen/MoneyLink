@@ -7,13 +7,8 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
     <div class="header-section">
       <h1 class="main-title">Smart Transfer Pro</h1>
       <p class="main-description">
-<<<<<<< HEAD
-        Send money internationally with the best exchange rates. 
-        Compare markets and find the perfect moment to transfer.
-=======
         Analyze real-time exchange rates and optimize your international transfers. 
         Compare market highs and find the perfect moment to send.
->>>>>>> 8de22d8c10544e7a76b782973d27bcc40a1ef442
       </p>
     </div>
 
