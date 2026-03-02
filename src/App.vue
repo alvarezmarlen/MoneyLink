@@ -37,7 +37,7 @@ onMounted(() => {
       <div class="navbar-links">
         <RouterLink to="/converter" class="nav-link">Pro</RouterLink>
         <a href="#" class="nav-link">Markets</a>
-        <a href="#" class="nav-link">Rates</a>
+        <RouterLink to="/rates" class="nav-link">Rates</RouterLink>
         <RouterLink v-if="isAuthenticated" to="/dashboard" class="nav-link">Dashboard</RouterLink>
       </div>
       
