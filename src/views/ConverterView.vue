@@ -5,7 +5,7 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
 <template>
   <div class="converter-page">
     <div class="header-section">
-      <h1 class="main-title">Smart Transfer Simulator</h1>
+      <h1 class="main-title">Smart Transfer Pro</h1>
       <p class="main-description">
         Analyze real-time exchange rates and optimize your international transfers with AI-driven insights. 
         Compare market highs and find the perfect moment to send.

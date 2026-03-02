@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService, transferStorage } from '../services/authService'
 import { CURRENCIES } from '../constants/currencies'
+import { transactionService } from '../services/transactionService'
 
 const router = useRouter()
 
@@ -97,13 +98,29 @@ const handlePayment = async () => {
   }
   
   const currentTransferData = transferStorage.getTransferData()
-  const updatedData = { ...currentTransferData, paymentMethod: selectedPaymentMethod.value, paymentData: paymentData }
-  transferStorage.saveTransferData(updatedData)
+  const updatedData = { 
+    ...currentTransferData, 
+    paymentMethod: selectedPaymentMethod.value, 
+    paymentData: paymentData,
+    id: String(Date.now()),
+    status: 'completed'
+  }
   
-  setTimeout(() => {
+  try {
+    // Persistent storage of the transaction
+    await transactionService.saveTransaction(updatedData)
+    transferStorage.saveTransferData(updatedData)
+    
+    setTimeout(() => {
+      isProcessing.value = false
+      router.push('/tracking')
+    }, 1500)
+  } catch (error) {
+    console.error('Error saving transaction:', error)
     isProcessing.value = false
+    alert('Payment successful, but there was an error recording the transaction.') // Basic error handling
     router.push('/tracking')
-  }, 1500)
+  }
 }
 
 const handleBack = () => {

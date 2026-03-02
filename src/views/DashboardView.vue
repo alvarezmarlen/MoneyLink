@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, computed, onActivated } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { authService, transferStorage } from '../services/authService'
 import { recipientService } from '../services/recipientService'
 import { transactionService } from '../services/transactionService'
@@ -9,7 +9,10 @@ import HistoryList from '../components/HistoryList.vue'
 import RecipientQuickList from '../components/RecipientQuickList.vue'
 import { useExchangeChart } from '../composables/useExchangeChart'
 
+const emit = defineEmits(['auth-change'])
+
 const router = useRouter()
+const route = useRoute()
 
 // Exchange chart composable
 const { chartCanvas, initChart, chartData } = useExchangeChart()
@@ -34,7 +37,7 @@ const loadData = async () => {
   }
   
   try {
-    frequentRecipients.value = await recipientService.getRecipients()
+    frequentRecipients.value = await recipientService.getRecipients(true)
   } catch (error) {
     console.error('Error loading recipients:', error)
     frequentRecipients.value = []
@@ -75,8 +78,11 @@ const loadExchangeRateChart = () => {
 
 onMounted(loadData)
 
-onActivated(() => {
-  loadData()
+// Reload data when the user lands on the dashboard
+watch(() => route.path, (newPath) => {
+  if (newPath === '/dashboard') {
+    loadData()
+  }
 })
 
 const greeting = computed(() => {
@@ -147,6 +153,7 @@ const goToProfile = () => {
 
 const handleLogout = () => {
   authService.logout()
+  emit('auth-change') // Inform App.vue to hide user info
   router.push('/converter')
 }
 </script>

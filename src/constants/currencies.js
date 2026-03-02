@@ -33,5 +33,5 @@ export const getCurrencyByCode = (code) => {
   return CURRENCIES.find(c => c.code === code) || null
 }
 
-export const EXCHANGE_RATE_API_KEY = 'c14522052b-39115726b5-tb0e4t'
-export const EXCHANGE_RATE_BASE_URL = 'https://v6.exchangerate-api.com/v6'
+export const EXCHANGE_RATE_API_KEY = 'df549e8c-8d89-4cc5-a8bf-4eede4948897'
+export const EXCHANGE_RATE_BASE_URL = 'https://api.exchangerateapi.net/v1/latest'

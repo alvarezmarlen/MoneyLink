@@ -1,79 +1,93 @@
-const TRANSACTIONS_KEY = 'moneylink_transactions'
-const CURRENT_USER_KEY = 'moneylink_current_user_transactions'
+import { authService } from './authService'
+
+const API_URL = 'http://localhost:3000/transactions'
+const LOCAL_STORAGE_KEY = 'moneylink_transactions'
 
 export const transactionService = {
-  getTransactions() {
-    const user = JSON.parse(localStorage.getItem('moneylink_auth'))
-    if (!user) return []
-    
-    const data = localStorage.getItem(`${CURRENT_USER_KEY}_${user.id}`)
+  _getLocalTransactions(userId) {
+    const data = localStorage.getItem(`${LOCAL_STORAGE_KEY}_${userId}`)
     return data ? JSON.parse(data) : []
   },
 
-  getTransactionById(id) {
-    const transactions = this.getTransactions()
-    return transactions.find(t => t.id === id)
+  _saveLocalTransaction(userId, transaction) {
+    const transactions = this._getLocalTransactions(userId)
+    if (!transactions.find(t => t.id === transaction.id)) {
+      transactions.unshift(transaction)
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_${userId}`, JSON.stringify(transactions))
+    }
   },
 
-  saveTransaction(transaction) {
-    const user = JSON.parse(localStorage.getItem('moneylink_auth'))
-    if (!user) return null
-    
-    const transactions = this.getTransactions()
-    
+  async getTransactions() {
+    const user = authService.getCurrentUser()
+    if (!user) return []
+
+    try {
+      const response = await fetch(`${API_URL}?userId=${String(user.id)}`)
+      if (!response.ok) throw new Error('API unstable')
+
+      const apiTransactions = await response.json()
+
+      // Filtrar transacciones corruptas (sin monto o sin divisas)
+      const validApiTx = apiTransactions.filter(t => t.amount !== null && t.fromCurrency && t.toCurrency)
+
+      const localTransactions = this._getLocalTransactions(user.id)
+      const combined = [...validApiTx]
+
+      localTransactions.forEach(lt => {
+        if (!combined.find(at => at.id === lt.id)) {
+          if (lt.amount !== null && lt.fromCurrency && lt.toCurrency) {
+            combined.push(lt)
+          }
+        }
+      })
+
+      return combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    } catch (error) {
+      console.warn('Usando respaldo local para el historial')
+      return this._getLocalTransactions(user.id)
+        .filter(t => t.amount !== null && t.fromCurrency && t.toCurrency)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    }
+  },
+
+  async saveTransaction(transaction) {
+    const user = authService.getCurrentUser()
+    if (!user) throw new Error('Usuario no autenticado')
+
+    // Validar datos mínimos antes de intentar guardar
+    if (!transaction.amount || !transaction.fromCurrency || !transaction.toCurrency) {
+      console.warn('Evitando guardar transaccion incompleta:', transaction)
+      return null
+    }
+
     const newTransaction = {
       ...transaction,
-      id: String(Date.now()),
-      userId: user.id,
-      createdAt: new Date().toISOString(),
+      userId: String(user.id),
+      amount: Number(transaction.amount),
+      convertedAmount: Number(transaction.convertedAmount),
+      createdAt: transaction.createdAt || new Date().toISOString(),
       status: 'completed'
     }
-    
-    transactions.unshift(newTransaction)
-    
-    localStorage.setItem(
-      `${CURRENT_USER_KEY}_${user.id}`, 
-      JSON.stringify(transactions)
-    )
-    
-    return newTransaction
+
+    this._saveLocalTransaction(user.id, newTransaction)
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTransaction)
+      })
+      if (!response.ok) throw new Error('API error')
+      return await response.json()
+    } catch (error) {
+      console.warn('Transacción guardada solo localmente')
+      return newTransaction
+    }
   },
 
-  deleteTransaction(id) {
-    const user = JSON.parse(localStorage.getItem('moneylink_auth'))
-    if (!user) return
-    
-    const transactions = this.getTransactions()
-    const filtered = transactions.filter(t => t.id !== id)
-    
-    localStorage.setItem(
-      `${CURRENT_USER_KEY}_${user.id}`, 
-      JSON.stringify(filtered)
-    )
-  },
-
-  getRecentTransactions(limit = 5) {
-    const transactions = this.getTransactions()
+  async getRecentTransactions(limit = 5) {
+    const transactions = await this.getTransactions()
     return transactions.slice(0, limit)
-  },
-
-  getTransactionsByDateRange(startDate, endDate) {
-    const transactions = this.getTransactions()
-    return transactions.filter(t => {
-      const txDate = new Date(t.createdAt)
-      return txDate >= startDate && txDate <= endDate
-    })
-  },
-
-  getTotalSent(fromCurrency) {
-    const transactions = this.getTransactions()
-    return transactions
-      .filter(t => t.fromCurrency === fromCurrency)
-      .reduce((sum, t) => sum + t.amount, 0)
-  },
-
-  simulateDelay() {
-    return new Promise(resolve => setTimeout(resolve, 200))
   }
 }
 

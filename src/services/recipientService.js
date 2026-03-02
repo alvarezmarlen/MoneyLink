@@ -4,48 +4,48 @@ const API_URL = 'http://localhost:3000/recipients'
 const LOCAL_STORAGE_KEY = 'moneylink_recipients'
 
 export const recipientService = {
-  _getLocalRecipients() {
-    const user = authService.getCurrentUser()
-    if (!user) return []
-    
-    const data = localStorage.getItem(`${LOCAL_STORAGE_KEY}_${user.id}`)
+  _getLocalRecipients(userId) {
+    const data = localStorage.getItem(`${LOCAL_STORAGE_KEY}_${userId}`)
     return data ? JSON.parse(data) : []
   },
 
-  _saveLocalRecipients(recipients) {
-    const user = authService.getCurrentUser()
-    if (!user) return
-    
-    localStorage.setItem(`${LOCAL_STORAGE_KEY}_${user.id}`, JSON.stringify(recipients))
+  _saveLocalRecipients(userId, recipients) {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_${userId}`, JSON.stringify(recipients))
   },
 
-  async getRecipients() {
+  async getRecipients(onlyFrequent = false) {
     const user = authService.getCurrentUser()
     if (!user) return []
 
     try {
-      const response = await fetch(`${API_URL}?userId=${user.id}`)
-      if (!response.ok) {
-        return this._getLocalRecipients()
+      // Intentamos obtener de la API
+      let url = `${API_URL}?userId=${String(user.id)}`
+      if (onlyFrequent) {
+        url += '&isFrequent=true'
       }
-      return await response.json()
-    } catch (error) {
-      console.warn('API no disponible, usando almacenamiento local')
-      return this._getLocalRecipients()
-    }
-  },
 
-  async getRecipientById(id) {
-    try {
-      const response = await fetch(`${API_URL}/${id}`)
-      if (!response.ok) {
-        const local = this._getLocalRecipients()
-        return local.find(r => r.id === id) || null
-      }
-      return await response.json()
+      const response = await fetch(url)
+      if (!response.ok) throw new Error('API unstable')
+
+      const apiRecipients = await response.json()
+
+      // Combinamos con los locales para máxima fidelidad
+      const localRecipients = this._getLocalRecipients(user.id)
+      const combined = [...apiRecipients]
+
+      localRecipients.forEach(lr => {
+        if (!combined.find(ar => ar.id === lr.id || ar.email === lr.email)) {
+          if (!onlyFrequent || lr.isFrequent) {
+            combined.push(lr)
+          }
+        }
+      })
+
+      return combined
     } catch (error) {
-      const local = this._getLocalRecipients()
-      return local.find(r => r.id === id) || null
+      console.warn('Usando respaldo local para destinatarios')
+      const local = this._getLocalRecipients(user.id)
+      return onlyFrequent ? local.filter(r => r.isFrequent) : local
     }
   },
 
@@ -53,23 +53,36 @@ export const recipientService = {
     const user = authService.getCurrentUser()
     if (!user) throw new Error('Usuario no autenticado')
 
-    const recipients = await this.getRecipients()
-    const existing = recipients.find(r => r.email === recipient.email)
-
     const data = {
       ...recipient,
-      userId: user.id,
-      updatedAt: new Date().toISOString()
+      userId: String(user.id),
+      updatedAt: new Date().toISOString(),
+      isFrequent: recipient.isFrequent !== undefined ? recipient.isFrequent : true
     }
 
+    // 1. Guardar localmente primero
+    const localRecipients = this._getLocalRecipients(user.id)
+    const existingIdx = localRecipients.findIndex(r => r.email === recipient.email)
+
+    if (existingIdx >= 0) {
+      localRecipients[existingIdx] = { ...localRecipients[existingIdx], ...data }
+    } else {
+      localRecipients.push({ ...data, id: String(Date.now()) })
+    }
+    this._saveLocalRecipients(user.id, localRecipients)
+
+    // 2. Intentar guardar en la API
     try {
-      if (existing) {
-        const response = await fetch(`${API_URL}/${existing.id}`, {
-          method: 'PUT',
+      // Primero buscamos si ya existe en la API por email
+      const checkRes = await fetch(`${API_URL}?email=${recipient.email}&userId=${user.id}`)
+      const existingApi = await checkRes.json()
+
+      if (existingApi.length > 0) {
+        const response = await fetch(`${API_URL}/${existingApi[0].id}`, {
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...existing, ...data })
+          body: JSON.stringify(data)
         })
-        if (!response.ok) throw new Error('API error')
         return await response.json()
       } else {
         const response = await fetch(API_URL, {
@@ -80,64 +93,11 @@ export const recipientService = {
             createdAt: new Date().toISOString()
           })
         })
-        if (!response.ok) throw new Error('API error')
         return await response.json()
       }
     } catch (error) {
-      console.warn('API no disponible, guardando localmente')
-      const newRecipient = {
-        ...data,
-        id: String(Date.now()),
-        createdAt: new Date().toISOString()
-      }
-      
-      if (existing) {
-        const idx = recipients.findIndex(r => r.email === recipient.email)
-        recipients[idx] = { ...existing, ...newRecipient }
-      } else {
-        recipients.push(newRecipient)
-      }
-      
-      this._saveLocalRecipients(recipients)
-      return newRecipient
-    }
-  },
-
-  async updateRecipient(id, recipientData) {
-    const user = authService.getCurrentUser()
-    if (!user) throw new Error('Usuario no autenticado')
-
-    try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...recipientData,
-          updatedAt: new Date().toISOString()
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error('API error')
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.warn('API no disponible, actualizando localmente')
-      const recipients = this._getLocalRecipients()
-      const idx = recipients.findIndex(r => r.id === id)
-      
-      if (idx >= 0) {
-        recipients[idx] = {
-          ...recipients[idx],
-          ...recipientData,
-          updatedAt: new Date().toISOString()
-        }
-        this._saveLocalRecipients(recipients)
-        return recipients[idx]
-      }
-      
-      throw new Error('Destinatario no encontrado')
+      console.warn('Destinatario guardado solo localmente')
+      return data
     }
   },
 
@@ -145,46 +105,14 @@ export const recipientService = {
     const user = authService.getCurrentUser()
     if (!user) return
 
+    // Eliminar local
+    const local = this._getLocalRecipients(user.id)
+    this._saveLocalRecipients(user.id, local.filter(r => r.id !== id))
+
     try {
-      const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
-      if (!response.ok) throw new Error('API error')
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
     } catch (error) {
-      console.warn('API no disponible, eliminando localmente')
-    }
-    
-    const recipients = this._getLocalRecipients()
-    const filtered = recipients.filter(r => r.id !== id)
-    this._saveLocalRecipients(filtered)
-  },
-
-  validateRecipient(data) {
-    const errors = {}
-
-    if (!data.fullName || data.fullName.length < 2) {
-      errors.fullName = 'El nombre debe tener al menos 2 caracteres'
-    }
-
-    if (!data.country) {
-      errors.country = 'El país es requerido'
-    }
-
-    if (!data.accountNumber) {
-      errors.accountNumber = 'El número de cuenta es requerido'
-    }
-
-    if (!data.phone) {
-      errors.phone = 'El teléfono es requerido'
-    } else if (!/^\+?[\d\s-]{8,}$/.test(data.phone)) {
-      errors.phone = 'Formato de teléfono inválido'
-    }
-
-    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      errors.email = 'Formato de email inválido'
-    }
-
-    return {
-      isValid: Object.keys(errors).length === 0,
-      errors
+      console.error('Error al eliminar en API')
     }
   }
 }

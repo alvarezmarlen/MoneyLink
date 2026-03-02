@@ -11,12 +11,17 @@ const props = defineProps({
 const emit = defineEmits(['select'])
 
 const formatCurrency = (amount, currency) => {
-  return new Intl.NumberFormat('es-ES', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount)
+  if (amount === null || amount === undefined || !currency) return '---'
+  try {
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(amount)
+  } catch (e) {
+    return `${amount} ${currency || ''}`
+  }
 }
 
 const formatDate = (dateString) => {
