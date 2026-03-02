@@ -5,70 +5,69 @@ export const currencyService = {
         try {
             if (from === to) return 1.0;
 
-            // Base URL from constants
+            // 1. Try primary API
             const baseUrl = EXCHANGE_RATE_BASE_URL;
-
-            // Construct URL with dynamic base and specific target currency to save bandwidth/limit
             const fetchUrl = `${baseUrl}?base=${from}&currencies=${to}`;
 
-            const response = await fetch(fetchUrl, {
-                method: 'GET',
-                headers: {
-                    'apikey': EXCHANGE_RATE_API_KEY
-                }
-            });
+            try {
+                const response = await fetch(fetchUrl, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': EXCHANGE_RATE_API_KEY
+                    }
+                });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error('API Error Response:', errorData);
+                const data = await response.json().catch(() => ({}));
 
-                // If the free tier doesn't allow changing the base (common error 105)
-                if (response.status === 403 || errorData.code === 105 || (errorData.error && errorData.error.code === 105)) {
-                    console.warn(`Base '${from}' not supported by this API plan. Attempting cross-rate calculation using USD.`);
-                    return this.getCrossRate(from, to);
+                // Detecting errors even if status is 200 (common in some API plans when quota is hit)
+                const isQuotaError = data.message && data.message.includes('rate limit exceeded');
+                const isUnauthorized = response.status === 403 || (data.error && data.error.code === 105);
+
+                if (response.ok && data.rates && data.rates[to]) {
+                    return data.rates[to];
                 }
-                throw new Error(`HTTP error! status: ${response.status}`);
+
+                if (isQuotaError || isUnauthorized) {
+                    console.warn(`Primary API limited or restricted for ${from}. Trying fallback API...`);
+                } else if (!response.ok) {
+                    throw new Error(`Primary API responded with ${response.status}`);
+                }
+            } catch (primaryError) {
+                console.error('Primary API fetch failed:', primaryError.message);
             }
 
-            const data = await response.json();
+            // 2. Fallback to a reliable public API if primary fails or is limited
+            // This ensures "offline mode" is only reached if everything fails
+            return await this.getFallbackRate(from, to);
 
-            if (data.rates && data.rates[to]) {
-                return data.rates[to];
-            } else {
-                throw new Error(`Rate for ${to} not found in response`);
-            }
         } catch (error) {
             console.error('Error in currencyService.getExchangeRate:', error);
             return null;
         }
     },
 
-    async getCrossRate(from, to) {
+    async getFallbackRate(from, to) {
         try {
-            // Fallback: Use USD as base if the API plan restricts changing the base currency
-            const baseUrl = EXCHANGE_RATE_BASE_URL;
-            const fetchUrl = `${baseUrl}?base=USD&currencies=${from},${to}`;
+            console.log(`Searching fallback for ${from} to ${to}...`);
+            // open.er-api.com is a reliable free fallback that supports multiple bases
+            const response = await fetch(`https://open.er-api.com/v6/latest/${from}`);
 
-            const response = await fetch(fetchUrl, {
-                method: 'GET',
-                headers: {
-                    'apikey': EXCHANGE_RATE_API_KEY
-                }
-            });
-
-            if (!response.ok) throw new Error(`Cross-rate fetch failed: ${response.status}`);
+            if (!response.ok) return null;
 
             const data = await response.json();
-
-            if (data.rates && data.rates[from] && data.rates[to]) {
-                // formula: Rate(A->B) = Rate(USD->B) / Rate(USD->A)
-                return data.rates[to] / data.rates[from];
+            if (data.result === 'success' && data.rates && data.rates[to]) {
+                return data.rates[to];
             }
             return null;
         } catch (error) {
-            console.error('Error in currencyService.getCrossRate:', error);
+            console.error('Fallback API failed:', error);
             return null;
         }
+    },
+
+    async getCrossRate(from, to) {
+        // Kept for backward compatibility if needed, but getExchangeRate now handles logic
+        return this.getFallbackRate(from, to);
     }
 }
 
