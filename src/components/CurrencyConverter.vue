@@ -7,7 +7,7 @@ import currencyService, { STATIC_RATES } from '../services/currencyService'
 
 const router = useRouter()
 
-const amount = ref(1000)
+const amount = ref(0)
 const fromCurrency = ref(DEFAULT_FROM_CURRENCY)
 const toCurrency = ref(DEFAULT_TO_CURRENCY)
 const isLoading = ref(false)
