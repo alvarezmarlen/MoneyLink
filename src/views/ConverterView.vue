@@ -7,20 +7,17 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
     <div class="header-section">
       <h1 class="main-title">Smart Transfer Pro</h1>
       <p class="main-description">
-        Analyze real-time exchange rates and optimize your international transfers with AI-driven insights. 
+        Analyze real-time exchange rates and optimize your international transfers. 
         Compare market highs and find the perfect moment to send.
       </p>
     </div>
 
     <div class="converter-grid">
-      <!-- Left Column -->
       <div class="left-column">
         <CurrencyConverter />
       </div>
 
-      <!-- Right Column -->
       <div class="right-column">
-        <!-- Analyst Note -->
         <div class="analyst-note">
            <div class="note-icon"></div>
            <div class="note-content">
@@ -29,7 +26,6 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
            </div>
         </div>
 
-        <!-- Trust Stats -->
         <div class="trust-stats">
            <div class="trust-box">
              <span class="trust-value">4.9/5</span>
@@ -41,7 +37,6 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
            </div>
         </div>
         
-        <!-- Market Status Info -->
         <div class="market-info-card">
            <div class="info-header">
              <span class="status-dot"></span>
@@ -52,7 +47,6 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
       </div>
     </div>
 
-    <!-- Features Section -->
     <div class="features-grid">
       <div class="feature-item">
         <h4>Instant Settlement</h4>
@@ -68,7 +62,6 @@ import CurrencyConverter from '../components/CurrencyConverter.vue'
       </div>
     </div>
 
-    <!-- Site Footer -->
     <footer class="site-footer">
       <div class="footer-left">
         <div class="footer-logo">

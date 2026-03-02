@@ -9,6 +9,7 @@ import PaymentView from '../views/PaymentView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import EditRecipientView from '../views/EditRecipientView.vue'
+import RatesView from '../views/RatesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/converter',
       name: 'converter',
       component: ConverterView
+    },
+    {
+      path: '/rates',
+      name: 'rates',
+      component: RatesView
     },
     {
       path: '/login',
