@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { CURRENCIES, DEFAULT_FROM_CURRENCY, DEFAULT_TO_CURRENCY } from '../constants/currencies'
 import { authService, transferStorage } from '../services/authService'
+import currencyService, { STATIC_RATES } from '../services/currencyService'
 
 const router = useRouter()
 
@@ -12,8 +13,45 @@ const toCurrency = ref(DEFAULT_TO_CURRENCY)
 const isLoading = ref(false)
 const error = ref(null)
 const lastUpdated = ref(new Date())
+const now = ref(new Date())
 
-const exchangeRate = ref(0.92)
+const exchangeRate = ref(1.0)
+
+const fetchRate = async () => {
+  if (fromCurrency.value === toCurrency.value) {
+    exchangeRate.value = 1.0
+    lastUpdated.value = new Date()
+    return
+  }
+
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const rate = await currencyService.getExchangeRate(fromCurrency.value, toCurrency.value)
+    if (rate != null && !isNaN(rate)) {
+      exchangeRate.value = rate
+      lastUpdated.value = new Date()
+    } else {
+      error.value = 'Service unavailable. Using static backup rate.'
+      if (STATIC_RATES &&
+          STATIC_RATES[fromCurrency.value] &&
+          STATIC_RATES[fromCurrency.value][toCurrency.value]) {
+        exchangeRate.value = STATIC_RATES[fromCurrency.value][toCurrency.value]
+      }
+    }
+  } catch (err) {
+    error.value = 'Failed to fetch the exchange rate.'
+    console.error(err)
+    if (STATIC_RATES &&
+        STATIC_RATES[fromCurrency.value] &&
+        STATIC_RATES[fromCurrency.value][toCurrency.value]) {
+      exchangeRate.value = STATIC_RATES[fromCurrency.value][toCurrency.value]
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const convertedAmount = computed(() => {
   if (!amount.value || isNaN(amount.value)) return 0
@@ -30,7 +68,7 @@ const toCurrencyData = computed(() => {
 
 const handleAmountInput = (event) => {
   const value = event.target.value
-  if (value === '' || /^\d+\.?\d*$/.test(value)) {
+  if (value === '' || /^(?:\d+|\d*\.\d*)$/.test(value)) {
     amount.value = value === '' ? '' : parseFloat(value)
   }
 }
@@ -39,7 +77,7 @@ const swapCurrencies = () => {
   const temp = fromCurrency.value
   fromCurrency.value = toCurrency.value
   toCurrency.value = temp
-  lastUpdated.value = new Date()
+  fetchRate()
 }
 
 const executeTransfer = () => {
@@ -59,19 +97,31 @@ const executeTransfer = () => {
 }
 
 const updateRate = () => {
-  isLoading.value = true
-  error.value = null
-  setTimeout(() => {
-    exchangeRate.value = exchangeRate.value + (Math.random() - 0.5) * 0.02
-    lastUpdated.value = new Date()
-    isLoading.value = false
-  }, 500)
+  fetchRate()
 }
 
 const timeAgo = computed(() => {
-  const seconds = Math.floor((new Date() - lastUpdated.value) / 1000)
+  const seconds = Math.floor((now.value - lastUpdated.value) / 1000)
   if (seconds < 5) return 'just now'
   return `${seconds}s ago`
+})
+
+let rateInterval = null
+let timeInterval = null
+
+onMounted(() => {
+  fetchRate()
+  rateInterval = setInterval(fetchRate, 60_000)
+  timeInterval = setInterval(() => { now.value = new Date() }, 1_000)
+})
+
+watch([fromCurrency, toCurrency], () => {
+  fetchRate()
+})
+
+onUnmounted(() => {
+  clearInterval(rateInterval)
+  clearInterval(timeInterval)
 })
 </script>
 
@@ -91,7 +141,7 @@ const timeAgo = computed(() => {
           <div class="input-wrapper">
             <input
               type="text"
-              :value="amount"
+              v-model.number="amount"
               @input="handleAmountInput"
               placeholder="Enter amount"
               class="amount-input"
@@ -297,9 +347,17 @@ const timeAgo = computed(() => {
 .swap-button-container {
   display: flex;
   justify-content: center;
-  margin: -16px 0;
+  margin: 24px 0;
   position: relative;
-  z-index: 2;
+  z-index: 10;
+}
+
+.swap-button {
+  position: relative;
+}
+
+.swap-button svg {
+  pointer-events: none;
 }
 
 .swap-button {

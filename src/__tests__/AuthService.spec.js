@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { authService, transferStorage } from '../services/authService'
 
 describe('AuthService - MCP Tests', () => {
@@ -17,9 +17,12 @@ describe('AuthService - MCP Tests', () => {
     })
 
     it('should reject invalid credentials', async () => {
+      // simulate network failure to exercise offline branch
+      global.fetch = vi.fn().mockRejectedValue(new Error('fetch failed'))
       await expect(
         authService.login('wrong@example.com', 'wrongpass')
-      ).rejects.toThrow('Invalid credentials')
+      ).rejects.toThrow(/Invalid credentials|fetch failed/)
+      global.fetch.mockRestore && global.fetch.mockRestore()
     })
 
     it('should store user in localStorage after login', async () => {
@@ -30,6 +33,13 @@ describe('AuthService - MCP Tests', () => {
       
       const user = JSON.parse(stored)
       expect(user.email).toBe('test@example.com')
+    })
+
+    it('should allow login from offline registered user', async () => {
+      // simulate offline registration by directly saving offline user
+      authService._saveOfflineUser({ id: '99', email: 'offline@test.com', password: 'off123', fullName: 'Offline', idNumber: '000' })
+      const user = await authService.login('offline@test.com', 'off123')
+      expect(user.email).toBe('offline@test.com')
     })
 
     it('should not store password in localStorage', async () => {

@@ -123,7 +123,12 @@ const handleLogin = async () => {
       router.push('/recipient')
     }, 500)
   } catch (e) {
-    error.value = e.message || 'Invalid email or password'
+    // network issues may indicate backend server not running
+    if (e.message && e.message.toLowerCase().includes('connect')) {
+      error.value = 'Cannot reach authentication server. Try running `npm run server` or check your network.'
+    } else {
+      error.value = e.message || 'Invalid email or password'
+    }
   } finally {
     isLoading.value = false
   }
@@ -152,7 +157,11 @@ const handleRegister = async () => {
       router.push('/recipient')
     }, 500)
   } catch (e) {
-    error.value = e.message || 'Registration failed'
+    if (e.message && e.message.toLowerCase().includes('connect')) {
+      error.value = 'Cannot reach authentication server. You may still register offline.'
+    } else {
+      error.value = e.message || 'Registration failed'
+    }
   } finally {
     isLoading.value = false
   }
