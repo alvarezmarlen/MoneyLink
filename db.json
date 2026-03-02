@@ -8,5 +8,17 @@
       "idNumber": "12345678"
     }
   ],
-  "recipients": []
+  "recipients": [
+    {
+      "id": "8539",
+      "fullName": "Xabi",
+      "country": "CAD",
+      "accountNumber": "sfgdfgfdgsdfg",
+      "phone": "+34 659856321",
+      "email": "",
+      "userId": "9eea",
+      "updatedAt": "2026-02-27T18:56:47.169Z",
+      "createdAt": "2026-02-27T18:56:47.169Z"
+    }
+  ]
 }
