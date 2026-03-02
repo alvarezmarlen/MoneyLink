@@ -195,14 +195,17 @@ const updateChartData = () => {
 }
 
 const handleCurrencyChange = () => {
-  if (fromCurrency.value === toCurrency.value) {
-    if (fromCurrency.value === 'USD') {
-      toCurrency.value = 'EUR'
-    } else {
-      toCurrency.value = 'USD'
-    }
-  }
   fetchHistoricalData()
+}
+
+const swapCurrencies = () => {
+  const temp = fromCurrency.value
+  fromCurrency.value = toCurrency.value
+  toCurrency.value = temp
+  fetchHistoricalData().then(() => {
+    initChart()
+    updateChart()
+  })
 }
 
 const refreshData = () => {
@@ -262,7 +265,7 @@ const startRealTimeUpdates = () => {
             </div>
 
             <div class="swap-button-container">
-              <button class="swap-button" @click="handleCurrencyChange" title="Swap currencies">
+              <button class="swap-button" @click="swapCurrencies" title="Swap currencies">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="17 1 21 5 17 9"></polyline>
                   <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
