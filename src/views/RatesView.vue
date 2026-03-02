@@ -13,6 +13,7 @@ import {
 } from 'chart.js'
 import currencyService from '../services/currencyService'
 import { CURRENCIES } from '../constants/currencies'
+import { useExchangeChartAI } from '../composables/useExchangeChartAI'
 
 ChartJS.register(
   LineElement,
@@ -35,6 +36,12 @@ const fromCurrency = ref('USD')
 const toCurrency = ref('EUR')
 const isLoading = ref(false)
 const isChartLoading = ref(true)
+
+const { aiResponse, isLoading: aiLoading, error: aiError, analyzeExchangeRate } = useExchangeChartAI()
+
+const runAIAnalysis = () => {
+  analyzeExchangeRate(labels.value, dataPoints.value, currentCurrencyPair.value)
+}
 
 const isPositiveChange = computed(() => {
   if (dataPoints.value.length < 2) return true
@@ -195,14 +202,17 @@ const updateChartData = () => {
 }
 
 const handleCurrencyChange = () => {
-  if (fromCurrency.value === toCurrency.value) {
-    if (fromCurrency.value === 'USD') {
-      toCurrency.value = 'EUR'
-    } else {
-      toCurrency.value = 'USD'
-    }
-  }
   fetchHistoricalData()
+}
+
+const swapCurrencies = () => {
+  const temp = fromCurrency.value
+  fromCurrency.value = toCurrency.value
+  toCurrency.value = temp
+  fetchHistoricalData().then(() => {
+    initChart()
+    updateChart()
+  })
 }
 
 const refreshData = () => {
@@ -262,7 +272,7 @@ const startRealTimeUpdates = () => {
             </div>
 
             <div class="swap-button-container">
-              <button class="swap-button" @click="handleCurrencyChange" title="Swap currencies">
+              <button class="swap-button" @click="swapCurrencies" title="Swap currencies">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="17 1 21 5 17 9"></polyline>
                   <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -331,6 +341,29 @@ const startRealTimeUpdates = () => {
             <div class="stat-item">
               <span class="stat-label">30D Low</span>
               <span class="stat-value">{{ Math.min(...dataPoints).toFixed(4) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-advisor-card">
+          <div class="ai-header">
+            <span class="ai-icon">✨</span>
+            <h4>AI Market Advisor</h4>
+            <button class="analyze-btn" @click="runAIAnalysis" :disabled="aiLoading || isChartLoading">
+              {{ aiLoading ? 'Analyzing...' : 'Get Insight' }}
+            </button>
+          </div>
+          
+          <div class="ai-content">
+            <div v-if="aiLoading" class="ai-loading">
+              <span class="loading-spinner mini"></span>
+              <p>Evaluating trends for {{ currentCurrencyPair }}...</p>
+            </div>
+            <div v-else-if="aiResponse" class="ai-response-box">
+              <p class="ai-text">{{ aiResponse }}</p>
+            </div>
+            <div v-else class="ai-placeholder">
+              <p>Click "Get Insight" for a real-time recommendation on your transfer.</p>
             </div>
           </div>
         </div>
@@ -602,6 +635,85 @@ const startRealTimeUpdates = () => {
 
 .stat-value.negative {
   color: #ff6b7a;
+}
+
+.ai-advisor-card {
+  background: rgba(0, 230, 118, 0.05);
+  border: 1px solid rgba(0, 230, 118, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.ai-icon {
+  font-size: 1.25rem;
+}
+
+.ai-header h4 {
+  margin: 0;
+  margin-right: auto;
+  margin-left: 10px;
+  font-size: 1rem;
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.analyze-btn {
+  background: var(--accent-color);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
+}
+
+.analyze-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-content {
+  min-height: 80px;
+}
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.loading-spinner.mini {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.ai-text {
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ai-placeholder {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-style: italic;
 }
 
 .trust-stats {

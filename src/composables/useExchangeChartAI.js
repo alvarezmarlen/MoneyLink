@@ -4,6 +4,7 @@ const GEMINI_API_KEY = 'AIzaSyDqGqGqGqGqGqGqGqGqGqGqGqGqGqGqGqG'
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 
 export function useExchangeChartAI() {
+
   const aiResponse = ref('')
   const isLoading = ref(false)
   const error = ref(null)

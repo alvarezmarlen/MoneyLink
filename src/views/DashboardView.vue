@@ -86,15 +86,15 @@ watch(() => route.path, (newPath) => {
 })
 
 const greeting = computed(() => {
-  if (!currentUser.value) return 'Bienvenido'
+  if (!currentUser.value) return 'Welcome'
   
   const hour = new Date().getHours()
-  let timeGreeting = 'Buenos días'
+  let timeGreeting = 'Good morning'
   
   if (hour >= 12 && hour < 18) {
-    timeGreeting = 'Buenas tardes'
+    timeGreeting = 'Good afternoon'
   } else if (hour >= 18) {
-    timeGreeting = 'Buenas noches'
+    timeGreeting = 'Good evening'
   }
   
   return `${timeGreeting}, ${currentUser.value.fullName?.split(' ')[0] || 'usuario'}`
@@ -163,16 +163,16 @@ const handleLogout = () => {
     <div class="dashboard-header">
       <div class="header-left">
         <h1>{{ greeting }}</h1>
-        <p class="subtitle">Resumen de tu actividad</p>
+        <p class="subtitle">Activity summary</p>
       </div>
       <div class="header-right">
         <button class="new-transfer-btn" @click="startNewTransfer">
           <span class="btn-icon">➕</span>
-          Nueva Transferencia
+          New Transfer
         </button>
         <button class="profile-btn" @click="goToProfile">
           <span class="btn-icon">👤</span>
-          Mi Perfil
+          My Profile
         </button>
       </div>
     </div>
@@ -195,7 +195,7 @@ const handleLogout = () => {
       <section v-if="currentTransaction" class="dashboard-section current-tx">
         <h2 class="section-title">
           <span class="title-icon">⏳</span>
-          Transacción en Curso
+          Transaction in Progress
         </h2>
         <TransactionCard 
           :transaction="currentTransaction" 
@@ -206,10 +206,10 @@ const handleLogout = () => {
       <section class="dashboard-section recipients-section">
         <h2 class="section-title">
           <span class="title-icon">⭐</span>
-          Destinatarios Frecuentes
+          Frequent Recipients
         </h2>
         <div v-if="isLoadingRecipients" class="loading-indicator">
-          <span>Cargando...</span>
+          <span>Loading...</span>
         </div>
         <RecipientQuickList 
           v-else
@@ -223,7 +223,7 @@ const handleLogout = () => {
       <section class="dashboard-section history-section">
         <h2 class="section-title">
           <span class="title-icon">📊</span>
-          Historial de Transacciones
+          Transaction History
         </h2>
         <HistoryList 
           :transactions="recentTransactions"
@@ -234,7 +234,7 @@ const handleLogout = () => {
     
     <div class="dashboard-footer">
       <button class="logout-btn" @click="handleLogout">
-        Cerrar Sesión
+        Log Out
       </button>
     </div>
   </div>
