@@ -24,6 +24,11 @@ const router = createRouter({
       component: ConverterView
     },
     {
+      path: '/rates',
+      name: 'rates',
+      component: RatesView
+    },
+    {
       path: '/login',
       name: 'login',
       component: AuthView

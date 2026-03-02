@@ -74,7 +74,6 @@ export const currencyService = {
             const labels = [];
             const dataPoints = [];
             const baseRate = await this.getExchangeRate(from, to);
-            
             if (!baseRate) {
                 return { labels: [], dataPoints: [] };
             }
@@ -86,7 +85,8 @@ export const currencyService = {
                 const date = new Date(now);
                 date.setDate(date.getDate() - i);
                 labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-                
+
+                // Simulate realistic historical variation
                 const variance = (Math.random() - 0.5) * 0.04 * baseValue;
                 const trendFactor = ((days - 1) - i) * 0.0002 * baseValue;
                 const historicalRate = baseValue + variance + trendFactor;
