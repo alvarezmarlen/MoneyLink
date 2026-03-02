@@ -93,31 +93,31 @@ const getCountryName = (code) => {
     <div class="sender-card">
       <div class="sender-header">
         <span class="step-icon">📤</span>
-        <h1>Datos del Remitente</h1>
-        <p class="subtitle">Ingresa tu información como quien envía el dinero</p>
+        <h1>Sender Details</h1>
+        <p class="subtitle">Enter your information as the sender</p>
       </div>
 
       <div class="steps-indicator">
         <div class="step" :class="{ completed: currentStep > 1 }">
           <span class="step-number">1</span>
-          <span class="step-label">Destinatario</span>
+          <span class="step-label">Beneficiary</span>
         </div>
         <div class="step-line" :class="{ active: currentStep > 1 }"></div>
         <div class="step" :class="{ active: currentStep >= 2, completed: currentStep > 2 }">
           <span class="step-number">2</span>
-          <span class="step-label">Remitente</span>
+          <span class="step-label">Sender</span>
         </div>
         <div class="step-line" :class="{ active: currentStep > 2 }"></div>
         <div class="step" :class="{ active: currentStep >= 3 }">
           <span class="step-number">3</span>
-          <span class="step-label">Pago</span>
+          <span class="step-label">Payment</span>
         </div>
       </div>
 
       <div class="sender-content">
         <form @submit.prevent="handleSubmit" class="sender-form">
           <div class="form-group">
-            <label for="sender-name">Nombre Completo</label>
+            <label for="sender-name">Full Name</label>
             <input
               id="sender-name"
               v-model="senderForm.fullName"
@@ -129,7 +129,7 @@ const getCountryName = (code) => {
           </div>
 
           <div class="form-group">
-            <label for="sender-id">Número de Identificación</label>
+            <label for="sender-id">ID Number</label>
             <input
               id="sender-id"
               v-model="senderForm.idNumber"
@@ -141,7 +141,7 @@ const getCountryName = (code) => {
           </div>
 
           <div class="form-group">
-            <label for="sender-phone">Teléfono</label>
+            <label for="sender-phone">Phone Number</label>
             <input
               id="sender-phone"
               v-model="senderForm.phone"
@@ -165,12 +165,12 @@ const getCountryName = (code) => {
           </div>
 
           <div class="form-group">
-            <label for="sender-address">Dirección (Opcional)</label>
+            <label for="sender-address">Address (Optional)</label>
             <input
               id="sender-address"
               v-model="senderForm.address"
               type="text"
-              placeholder="Tu dirección"
+              placeholder="Your Address"
             />
           </div>
 
@@ -179,7 +179,7 @@ const getCountryName = (code) => {
               Atrás
             </button>
             <button type="submit" class="submit-button">
-              Continuar
+              Continue
             </button>
           </div>
         </form>
@@ -188,17 +188,17 @@ const getCountryName = (code) => {
       <div v-if="transferData && recipientData" class="transfer-summary">
         <div class="summary-row">
           <div class="summary-item">
-            <span class="summary-label">Envía</span>
+            <span class="summary-label">Send</span>
             <span class="summary-value">{{ transferData.amount }} {{ transferData.fromCurrency }}</span>
           </div>
           <div class="summary-arrow">→</div>
           <div class="summary-item">
-            <span class="summary-label">Recibe</span>
+            <span class="summary-label">Receive</span>
             <span class="summary-value highlight">{{ transferData.convertedAmount }} {{ transferData.toCurrency }}</span>
           </div>
         </div>
         <div class="summary-recipient">
-          <span class="recipient-label">Destinatario:</span>
+          <span class="recipient-label">Addressee:</span>
           <span class="recipient-name">{{ recipientData.fullName }} ({{ getCountryName(recipientData.country) }})</span>
         </div>
       </div>
