@@ -1,33 +1,14 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import Chart from 'chart.js/auto'
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js'
 import currencyService from '../services/currencyService'
 import { CURRENCIES } from '../constants/currencies'
 import { useExchangeChartAI } from '../composables/useExchangeChartAI'
 
-ChartJS.register(
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Title,
-  Tooltip,
-  Legend
-)
-
 const chartCanvas = ref(null)
 let chartInstance = null
 let updateInterval = null
+let initTimeout = null
 
 const labels = ref([])
 const dataPoints = ref([])
@@ -83,10 +64,10 @@ const initChart = () => {
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels.value,
+      labels: [...labels.value],
       datasets: [{
         label: currentCurrencyPair.value,
-        data: dataPoints.value,
+        data: [...dataPoints.value],
         borderColor: '#00E676',
         backgroundColor: 'rgba(0, 230, 118, 0.05)',
         borderWidth: 2,
@@ -178,10 +159,10 @@ const initChart = () => {
 const updateChart = () => {
   if (!chartInstance) return
 
-  chartInstance.data.labels = labels.value
-  chartInstance.data.datasets[0].data = dataPoints.value
+  chartInstance.data.labels = [...labels.value]
+  chartInstance.data.datasets[0].data = [...dataPoints.value]
   chartInstance.data.datasets[0].label = currentCurrencyPair.value
-  chartInstance.update('active')
+  chartInstance.update('none')
 }
 
 const updateChartData = () => {
@@ -202,7 +183,9 @@ const updateChartData = () => {
 }
 
 const handleCurrencyChange = () => {
-  fetchHistoricalData()
+  fetchHistoricalData().then(() => {
+    updateChart()
+  })
 }
 
 const swapCurrencies = () => {
@@ -225,25 +208,31 @@ const refreshData = () => {
 onMounted(async () => {
   await fetchHistoricalData()
   
-  setTimeout(() => {
-    initChart()
-    startRealTimeUpdates()
-  }, 100)
+  await nextTick()
+  initChart()
+  startRealTimeUpdates()
 })
 
 onUnmounted(() => {
   if (chartInstance) {
     chartInstance.destroy()
+    chartInstance = null
   }
   if (updateInterval) {
     clearInterval(updateInterval)
+    updateInterval = null
+  }
+  if (initTimeout) {
+    clearTimeout(initTimeout)
+    initTimeout = null
   }
 })
 
 const startRealTimeUpdates = () => {
+  if (updateInterval) clearInterval(updateInterval)
   updateInterval = setInterval(() => {
     updateChartData()
-  }, 5000)
+  }, 12000) // Increased to 12s for better stability
 }
 </script>
 
