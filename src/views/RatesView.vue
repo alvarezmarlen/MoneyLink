@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import Chart from 'chart.js/auto'
 import {
   Chart as ChartJS,
@@ -11,9 +11,8 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
-import { CURRENCIES } from '../constants/currencies'
 import currencyService from '../services/currencyService'
-import { useExchangeChartAI } from '../composables/useExchangeChartAI'
+import { CURRENCIES } from '../constants/currencies'
 
 ChartJS.register(
   LineElement,
@@ -36,42 +35,13 @@ const fromCurrency = ref('USD')
 const toCurrency = ref('EUR')
 const isLoading = ref(false)
 const isChartLoading = ref(true)
-const currentRate = ref(0)
-const rateChange = ref(0)
-
-const { aiResponse, isLoading: aiLoading, error: aiError, analyzeExchangeRate } = useExchangeChartAI()
-
-const fromCurrencyData = computed(() => {
-  return CURRENCIES.find(c => c.code === fromCurrency.value) || CURRENCIES[0]
-})
-
-const toCurrencyData = computed(() => {
-  return CURRENCIES.find(c => c.code === toCurrency.value) || CURRENCIES[1]
-})
 
 const isPositiveChange = computed(() => {
-  return parseFloat(rateChange.value) >= 0
+  if (dataPoints.value.length < 2) return true
+  const current = dataPoints.value[dataPoints.value.length - 1]
+  const previous = dataPoints.value[dataPoints.value.length - 2]
+  return current >= previous
 })
-
-const fetchCurrentRate = async () => {
-  if (fromCurrency.value === toCurrency.value) {
-    currentRate.value = 1
-    rateChange.value = 0
-    return
-  }
-
-  try {
-    const rate = await currencyService.getExchangeRate(fromCurrency.value, toCurrency.value)
-    if (rate) {
-      const previousRate = currentRate.value || rate
-      currentRate.value = rate
-      rateChange.value = ((rate - previousRate) / previousRate * 100).toFixed(2)
-      currentCurrencyPair.value = `${fromCurrency.value}/${toCurrency.value}`
-    }
-  } catch (error) {
-    console.error('Error fetching current rate:', error)
-  }
-}
 
 const fetchHistoricalData = async () => {
   isChartLoading.value = true
@@ -85,9 +55,6 @@ const fetchHistoricalData = async () => {
     dataPoints.value = newData
     
     if (dataPoints.value.length > 0) {
-      currentRate.value = dataPoints.value[dataPoints.value.length - 1]
-      const previousRate = dataPoints.value.length > 1 ? dataPoints.value[dataPoints.value.length - 2] : currentRate.value
-      rateChange.value = ((currentRate.value - previousRate) / previousRate * 100).toFixed(2)
       currentCurrencyPair.value = `${fromCurrency.value}/${toCurrency.value}`
     }
   } catch (error) {
@@ -224,10 +191,6 @@ const updateChartData = () => {
   labels.value.shift()
   labels.value.push(newLabel)
 
-  currentRate.value = newValue
-  const previousRate = dataPoints.value[dataPoints.value.length - 2] || newValue
-  rateChange.value = ((newValue - previousRate) / previousRate * 100).toFixed(2)
-
   updateChart()
 }
 
@@ -240,15 +203,9 @@ const handleCurrencyChange = () => {
     }
   }
   fetchHistoricalData()
-  fetchCurrentRate()
-}
-
-const runAIAnalysis = () => {
-  analyzeExchangeRate(labels.value, dataPoints.value, currentCurrencyPair.value)
 }
 
 const refreshData = () => {
-  fetchCurrentRate()
   fetchHistoricalData().then(() => {
     initChart()
     updateChart()
@@ -257,12 +214,10 @@ const refreshData = () => {
 
 onMounted(async () => {
   await fetchHistoricalData()
-  await fetchCurrentRate()
   
   setTimeout(() => {
     initChart()
     startRealTimeUpdates()
-    runAIAnalysis()
   }, 100)
 })
 
@@ -280,10 +235,6 @@ const startRealTimeUpdates = () => {
     updateChartData()
   }, 5000)
 }
-
-const formattedCurrentRate = computed(() => {
-  return currentRate.value.toFixed(4)
-})
 </script>
 
 <template>
@@ -331,16 +282,6 @@ const formattedCurrentRate = computed(() => {
             </div>
           </div>
 
-          <div class="current-rate-display">
-            <span class="rate-label">Current Rate</span>
-            <div class="rate-value-group">
-              <span class="rate-value">1 {{ fromCurrency }} = {{ formattedCurrentRate }} {{ toCurrency }}</span>
-              <span class="rate-change" :class="{ positive: isPositiveChange, negative: !isPositiveChange }">
-                {{ isPositiveChange ? '↑' : '↓' }} {{ Math.abs(rateChange) }}%
-              </span>
-            </div>
-          </div>
-
           <button class="refresh-button" @click="refreshData" :disabled="isLoading">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="23 4 23 10 17 10"></polyline>
@@ -359,31 +300,6 @@ const formattedCurrentRate = computed(() => {
           <div v-else class="chart-container">
             <canvas ref="chartCanvas"></canvas>
           </div>
-        </div>
-
-        <div class="ai-insight-section">
-          <div class="ai-question">
-            <span class="question-icon">🤔</span>
-            <h3>Is this a good time to send money?</h3>
-          </div>
-          
-          <div class="ai-response" v-if="aiResponse || aiLoading">
-            <div class="response-loading" v-if="aiLoading">
-              <span class="loading-spinner"></span>
-              <p>Analyzing market data...</p>
-            </div>
-            <div class="response-content" v-else>
-              <p>{{ aiResponse }}</p>
-            </div>
-          </div>
-          
-          <div class="ai-error" v-else-if="aiError">
-            <p>{{ aiError }}</p>
-          </div>
-
-          <button class="analyze-btn" @click="runAIAnalysis" :disabled="aiLoading">
-            {{ aiLoading ? 'Analyzing...' : 'Analyze Market' }}
-          </button>
         </div>
       </div>
 
@@ -428,18 +344,6 @@ const formattedCurrentRate = computed(() => {
             <span class="trust-value">Secure</span>
             <span class="trust-label">BANK-LEVEL ENCRYPTION</span>
           </div>
-        </div>
-
-        <div class="currency-info-card">
-          <h4>{{ fromCurrencyData.name }} ({{ fromCurrencyData.code }})</h4>
-          <p>{{ fromCurrencyData.region }}</p>
-          <div class="currency-symbol">{{ fromCurrencyData.flag }} {{ fromCurrencyData.symbol }}</div>
-        </div>
-
-        <div class="currency-info-card">
-          <h4>{{ toCurrencyData.name }} ({{ toCurrencyData.code }})</h4>
-          <p>{{ toCurrencyData.region }}</p>
-          <div class="currency-symbol">{{ toCurrencyData.flag }} {{ toCurrencyData.symbol }}</div>
         </div>
       </div>
     </div>
@@ -566,50 +470,6 @@ const formattedCurrentRate = computed(() => {
   transform: scale(1.1) rotate(180deg);
 }
 
-.current-rate-display {
-  background: rgba(0, 230, 118, 0.05);
-  border: 1px solid var(--accent-color);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.rate-label {
-  display: block;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  margin-bottom: 8px;
-}
-
-.rate-value-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.rate-value {
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.rate-change {
-  font-size: 0.875rem;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-
-.rate-change.positive {
-  color: #00E676;
-  background: rgba(0, 230, 118, 0.1);
-}
-
-.rate-change.negative {
-  color: #ff6b7a;
-  background: rgba(255, 107, 122, 0.1);
-}
-
 .refresh-button {
   display: flex;
   align-items: center;
@@ -674,86 +534,6 @@ const formattedCurrentRate = computed(() => {
   border-radius: 12px;
   padding: 16px;
   height: 280px;
-}
-
-.ai-insight-section {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.ai-question {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.question-icon {
-  font-size: 1.5rem;
-}
-
-.ai-question h3 {
-  color: var(--text-primary);
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.ai-response {
-  min-height: 60px;
-  margin-bottom: 16px;
-}
-
-.response-loading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--text-secondary);
-}
-
-.response-content {
-  background: rgba(0, 230, 118, 0.05);
-  border: 1px solid rgba(0, 230, 118, 0.2);
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.response-content p {
-  color: var(--text-primary);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.ai-error {
-  color: #ff6b7a;
-  font-size: 0.875rem;
-  margin-bottom: 16px;
-}
-
-.analyze-btn {
-  width: 100%;
-  background: transparent;
-  border: 1px solid var(--accent-color);
-  color: var(--accent-color);
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.analyze-btn:hover:not(:disabled) {
-  background: var(--accent-color);
-  color: #000000;
-}
-
-.analyze-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .market-status-card {
@@ -851,29 +631,6 @@ const formattedCurrentRate = computed(() => {
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-}
-
-.currency-info-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 20px;
-}
-
-.currency-info-card h4 {
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-  color: var(--text-primary);
-}
-
-.currency-info-card p {
-  margin: 0 0 12px 0;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-}
-
-.currency-symbol {
-  font-size: 1.5rem;
 }
 
 @media (max-width: 1024px) {

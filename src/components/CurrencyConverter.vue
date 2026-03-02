@@ -3,8 +3,6 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { CURRENCIES, DEFAULT_FROM_CURRENCY, DEFAULT_TO_CURRENCY } from '../constants/currencies'
 import { authService, transferStorage } from '../services/authService'
-import currencyService from '../services/currencyService'
-import { onMounted, watch } from 'vue'
 
 const router = useRouter()
 
@@ -15,43 +13,7 @@ const isLoading = ref(false)
 const error = ref(null)
 const lastUpdated = ref(new Date())
 
-const exchangeRate = ref(1.0)
-
-const fetchRate = async () => {
-  if (fromCurrency.value === toCurrency.value) {
-    exchangeRate.value = 1.0
-    return
-  }
-  
-  isLoading.value = true
-  error.value = null
-  
-  try {
-    const rate = await currencyService.getExchangeRate(fromCurrency.value, toCurrency.value)
-    if (rate) {
-      exchangeRate.value = rate
-      lastUpdated.value = new Date()
-    } else {
-      error.value = 'Service unavailable. Switching to offline mode.'
-      // Fallback to simulation if API fails or rate is not found
-      exchangeRate.value = exchangeRate.value + (Math.random() - 0.5) * 0.01
-    }
-  } catch (err) {
-    error.value = 'Failed to fetch the exchange rate.'
-  } finally {
-    isLoading.value = false
-  }
-}
-
-// Initial fetch
-onMounted(() => {
-  fetchRate()
-})
-
-// Update when currencies change
-watch([fromCurrency, toCurrency], () => {
-  fetchRate()
-})
+const exchangeRate = ref(0.92)
 
 const convertedAmount = computed(() => {
   if (!amount.value || isNaN(amount.value)) return 0
@@ -97,7 +59,13 @@ const executeTransfer = () => {
 }
 
 const updateRate = () => {
-  fetchRate()
+  isLoading.value = true
+  error.value = null
+  setTimeout(() => {
+    exchangeRate.value = exchangeRate.value + (Math.random() - 0.5) * 0.02
+    lastUpdated.value = new Date()
+    isLoading.value = false
+  }, 500)
 }
 
 const timeAgo = computed(() => {
