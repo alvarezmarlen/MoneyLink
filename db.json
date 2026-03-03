@@ -9,5 +9,30 @@
     }
   ],
   "recipients": [],
-  "transactions": [] 
- }
+  "transactions": [
+    {
+      "id": "1772543407409",
+      "amount": 500,
+      "fromCurrency": "USD",
+      "toCurrency": "EUR",
+      "convertedAmount": 450,
+      "recipient": {
+        "fullName": "John Doe",
+        "country": "CO"
+      },
+      "userId": "1",
+      "createdAt": "2026-03-03T13:10:07.409Z",
+      "status": "completed"
+    },
+    {
+      "id": "1772543407423",
+      "amount": 100,
+      "fromCurrency": "USD",
+      "toCurrency": "EUR",
+      "userId": "1",
+      "convertedAmount": null,
+      "createdAt": "2026-03-03T13:10:07.423Z",
+      "status": "completed"
+    }
+  ]
+}
