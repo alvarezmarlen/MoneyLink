@@ -1,146 +1,146 @@
-# MoneyLink - Documentation
+# MoneyLink - Documentación
 
-## Completed Tasks Summary
+## Resumen de Tareas Completadas
 
-### US-001: Currency Converter (TK-001-01 to TK-001-11)
-✅ Completed in previous session
+### US-001: Convertidor de Divisas (TK-001-01 a TK-001-11)
+Completado en la sesión anterior
 
-### US-002: Authentication (TK-002-01 to TK-002-09)
-✅ Completed in previous session
+### US-002: Autenticación (TK-002-01 a TK-002-09)
+Completado en la sesión anterior
 
 ### US-003: Proceso de envío de divisas (TK-003-01 a TK-003-07)
-✅ TK-003-01: Crear formulario para datos del destinatario y checkbox de destinatario frecuente
-✅ TK-003-02: Crear formulario para los datos del remitente
-✅ TK-003-03: Implementar apartado de selección de método de pago
-✅ TK-003-04: Desarrollar vista de resumen (montos, exchange, tarifas) y botón de continuar
-✅ TK-003-05: Lógica de validación de datos del destinatario y cálculo en tiempo real
-✅ TK-003-06: Crear test E2E para validar flujos de transferencia
-✅ TK-003-07: Crear test MCP para validar flujos de transferencia
+TK-003-01: Crear formulario para datos del destinatario y checkbox de destinatario frecuente
+TK-003-02: Crear formulario para los datos del remitente
+TK-003-03: Implementar apartado de selección de método de pago
+TK-003-04: Desarrollar vista de resumen (montos, tipo de cambio, tarifas) y botón de continuar
+TK-003-05: Lógica de validación de datos del destinatario y cálculo en tiempo real
+TK-003-06: Crear test E2E para validar flujos de transferencia
+TK-003-07: Crear test MCP para validar flujos de transferencia
 
 ### US-004: Dashboard de transacciones (TK-004-01 a TK-004-09)
-✅ TK-004-01: Diseñar interfaz del dashboard
-✅ TK-004-02: Implementar servicio de consulta de transacción en curso
-✅ TK-004-03: Implementar servicio de historial de transacciones
-✅ TK-004-04: Implementar consulta de destinatarios frecuentes
-✅ TK-004-05: Desarrollar vista del dashboard
-✅ TK-004-06: Implementar navegación a flujo de nueva transacción
-✅ TK-004-07: Pruebas funcionales y de integración
+TK-004-01: Diseñar interfaz del dashboard
+TK-004-02: Implementar servicio de consulta de transacción en curso
+TK-004-03: Implementar servicio de historial de transacciones
+TK-004-04: Implementar consulta de destinatarios frecuentes
+TK-004-05: Desarrollar vista del dashboard
+TK-004-06: Implementar navegación al flujo de nueva transacción
+TK-004-07: Pruebas funcionales y de integración
 
 ### US-005: Edición y modificación de perfil (TK-005-01 a TK-005-08)
-✅ TK-005-01: Diseñar interfaz de edición de perfil
-✅ TK-005-02: Implementar servicio de actualización de perfil
-✅ TK-005-03: Implementar validaciones de datos del usuario
-✅ TK-005-04: Desarrollar vista de edición de perfil
-✅ TK-005-05: Implementar funcionalidad de edición de usuarios frecuentes
-✅ TK-005-06: Pruebas funcionales y de validación
+TK-005-01: Diseñar interfaz de edición de perfil
+TK-005-02: Implementar servicio de actualización de perfil
+TK-005-03: Implementar validaciones de datos del usuario
+TK-005-04: Desarrollar vista de edición de perfil
+TK-005-05: Implementar funcionalidad de edición de usuarios frecuentes
+TK-005-06: Pruebas funcionales y de validación
 
 ---
 
-## AuthView Component - Documentation
+## Documentación del Componente AuthView
 
-### Overview
+### Vista General
 
-This documentation covers the authentication components created for the MoneyLink project (Tasks TK-002-01 through TK-002-09).
+Esta documentación cubre los componentes de autenticación creados para el proyecto MoneyLink (Tareas TK-002-01 a TK-002-09).
 
-### Files Created/Modified
+### Archivos Creados/Modificados
 
-| File | Action | Description |
+| Archivo | Acción | Descripción |
 |------|--------|-------------|
-| `src/services/authService.js` | Created | Authentication service with login, register, logout, and transfer data storage |
-| `src/views/AuthView.vue` | Created | Main authentication view with login/register forms |
-| `src/views/TransferView.vue` | Created | Placeholder view for transfer confirmation |
-| `src/router/index.js` | Modified | Added routes: `/login`, `/register`, `/transfer` |
-| `src/components/CurrencyConverter.vue` | Modified | Added transfer data storage before redirect |
-| `src/App.vue` | Modified | Updated navbar links to use router |
-| `src/__tests__/AuthView.spec.js` | Created | E2E tests for authentication flows |
-| `src/__tests__/AuthService.spec.js` | Created | MCP tests for auth service |
+| `src/services/authService.js` | Creado | Servicio de autenticación con inicio de sesión, registro, cierre de sesión y almacenamiento de datos de transferencia |
+| `src/views/AuthView.vue` | Creado | Vista principal de autenticación con formularios de inicio de sesión y registro |
+| `src/views/TransferView.vue` | Creado | Vista provisional (placeholder) para la confirmación de transferencia |
+| `src/router/index.js` | Modificado | Rutas añadidas: `/login`, `/register`, `/transfer` |
+| `src/components/CurrencyConverter.vue` | Modificado | Se añadió el almacenamiento de datos de transferencia antes del redireccionamiento |
+| `src/App.vue` | Modificado | Enlaces de la barra de navegación actualizados para usar el enrutador |
+| `src/__tests__/AuthView.spec.js` | Creado | Pruebas E2E para flujos de autenticación |
+| `src/__tests__/AuthService.spec.js` | Creado | Pruebas MCP para el servicio de autenticación |
 
-### Features Implemented
+### Funcionalidades Implementadas
 
-#### Login Form
-- Email input with validation
-- Password input
-- Error handling for invalid credentials
-- Success message on successful login
+#### Formulario de Inicio de Sesión
+- Entrada de correo electrónico con validación
+- Entrada de contraseña
+- Manejo de errores para credenciales inválidas
+- Mensaje de éxito tras un inicio de sesión correcto
 
-#### Registration Form
-- Full name input
-- Email input with validation
-- Password input (minimum 8 characters)
-- Confirm password input
-- ID Number input (National ID, minimum 5 characters)
-- Error handling for validation failures
+#### Formulario de Registro
+- Entrada de nombre completo
+- Entrada de correo electrónico con validación
+- Entrada de contraseña (mínimo 8 caracteres)
+- Entrada de confirmación de contraseña
+- Entrada de número de identificación (DNI/Cédula, mínimo 5 caracteres)
+- Manejo de errores por fallos de validación
 
-#### Transfer Data Flow
-- Transfer data saved to localStorage when executing transfer
-- Transfer data retrieved on login/register
-- Redirect to `/transfer` after authentication with saved data
+#### Flujo de Datos de Transferencia
+- Datos de transferencia guardados en `localStorage` al ejecutar la transferencia
+- Datos de transferencia recuperados al iniciar sesión o registrarse
+- Redirección a `/transfer` después de la autenticación con los datos guardados
 
-### Validation Rules
+### Reglas de Validación
 
-| Field | Rule |
+| Campo | Regla |
 |-------|------|
-| Email | Required, valid email format |
-| Password (login) | Required |
-| Password (register) | Required, minimum 8 characters |
-| Confirm Password | Must match password |
-| Full Name | Required, minimum 2 characters |
-| ID Number | Required, minimum 5 characters |
+| Correo Electrónico | Obligatorio, formato de correo válido |
+| Contraseña (login) | Obligatorio |
+| Contraseña (registro) | Obligatorio, mínimo 8 caracteres |
+| Confirmar Contraseña | Debe coincidir con la contraseña |
+| Nombre Completo | Obligatorio, mínimo 2 caracteres |
+| Número de ID | Obligatorio, mínimo 5 caracteres |
 
-### Error Messages
+### Mensajes de Error
 
-- Email is required
-- Invalid email format
-- Password is required
-- Password must be at least 8 characters
-- Passwords do not match
-- Full name is required
-- ID number is required
-- ID number must be at least 5 characters
-- Invalid credentials
-- Email already exists
+- El correo electrónico es obligatorio
+- Formato de correo electrónico inválido
+- La contraseña es obligatoria
+- La contraseña debe tener al menos 8 caracteres
+- Las contraseñas no coinciden
+- El nombre completo es obligatorio
+- El número de identificación es obligatorio
+- El número de identificación debe tener al menos 5 caracteres
+- Credenciales inválidas
+- El correo electrónico ya existe
 
-### Glassmorphism Styles
+### Estilos de Glassmorphism (Efecto Cristal)
 
-Applied to:
+Aplicado a:
 - AuthView.vue
 - CurrencyConverter.vue
 - TransferView.vue
 
-Style: `backdrop-filter: blur(10px)` with semi-transparent backgrounds
+Estilo: `backdrop-filter: blur(10px)` con fondos semitransparentes.
 
-### Testing
+### Pruebas (Testing)
 
-Run tests with:
+Ejecutar pruebas con:
 ```bash
 npm run test:unit
 ```
 
-All 42 tests passing:
-- 17 AuthService tests (MCP)
-- 25 AuthView tests (E2E)
+Las 42 pruebas han pasado correctamente:
+- 17 pruebas de AuthService (MCP)
+- 25 pruebas de AuthView (E2E)
 
-### Mock Users
+### Usuarios de Prueba (Mock Users)
 
-For testing:
-- Email: `test@example.com`
-- Password: `password123`
+Para propósitos de prueba:
+- Correo: `test@example.com`
+- Contraseña: `password123`
 
-### Routes
+### Rutas
 
-| Path | Component | Description |
+| Ruta | Componente | Descripción |
 |------|-----------|-------------|
-| `/` | Redirects to `/converter` | Home |
-| `/converter` | ConverterView | Currency converter |
-| `/login` | AuthView | Login form |
-| `/register` | AuthView | Registration form |
-| `/transfer` | TransferView | Transfer confirmation (placeholder) |
+| `/` | Redirige a `/converter` | Inicio |
+| `/converter` | ConverterView | Convertidor de divisas |
+| `/login` | AuthView | Formulario de inicio de sesión |
+| `/register` | AuthView | Formulario de registro |
+| `/transfer` | TransferView | Confirmación de transferencia (provisional) |
 
-### Design Decisions
+### Decisiones de Diseño
 
-1. **Service-based architecture**: Authentication logic in separate service
-2. **LocalStorage**: Used for session and transfer data persistence
-3. **Form validation**: Client-side validation before submission
-4. **Error handling**: Clear error messages for each validation failure
-5. **Glassmorphism**: Applied following project design system
-6. **Mobile-first**: Responsive design for all views
+1. **Arquitectura basada en servicios**: Lógica de autenticación en un servicio independiente.
+2. **LocalStorage**: Utilizado para la persistencia de la sesión y los datos de transferencia.
+3. **Validación de formularios**: Validación en el lado del cliente antes del envío.
+4. **Manejo de errores**: Mensajes de error claros para cada fallo de validación.
+5. **Glassmorphism**: Aplicado siguiendo el sistema de diseño del proyecto.
+6. **Mobile-first**: Diseño responsivo para todas las vistas.
