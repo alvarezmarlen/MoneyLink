@@ -47,7 +47,7 @@ onMounted(() => {
         </button>
         <template v-if="isAuthenticated">
           <span class="user-name">{{ currentUser?.fullName?.split(' ')[0] }}</span>
-          <RouterLink to="/dashboard" class="dashboard-link">Mi Cuenta</RouterLink>
+          <RouterLink to="/dashboard" class="dashboard-link">My account</RouterLink>
         </template>
         <template v-else>
           <RouterLink to="/login" class="auth-link">Log In</RouterLink>

@@ -169,7 +169,7 @@ const selectRecipient = (recipient) => {
     </div>
 
     <div class="form-group">
-      <label for="recipient-email">Email (Optional)</label>
+      <label for="recipient-email">Email</label>
       <input
         id="recipient-email"
         v-model="form.email"
