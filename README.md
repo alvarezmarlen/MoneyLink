@@ -25,6 +25,7 @@ MoneyLink es una aplicación fintech (aplicación perteneciente al sector financ
 - **Persistencia de Datos**: Base de datos JSON con JSON Server
 - **Validaciones Robustas**: Verificación de datos en formularios
 - **Interfaz Moderna**: Diseño con efecto glassmorphism y tema personalizable
+- **Análisis Inteligente**: Recomendaciones del modelo Gemini AI sobre el mejor momento para enviar dinero
 - **Responsive**: Adaptable a diferentes dispositivos
 
 ## Tecnologías Utilizadas
@@ -41,7 +42,20 @@ MoneyLink es una aplicación fintech (aplicación perteneciente al sector financ
 ### Chart.js
 
 [Chart.js](https://www.chartjs.org/) es una librería JavaScript de código abierto para crear gráficos interactivos y responsivos. En MoneyLink se utiliza para visualizar la evolución de las tasas de cambio entre divisas mediante gráficos de líneas, permitiendo a los usuarios analizar las tendencias del mercado de forma visual e intuitiva. La librería ofrece alto rendimiento, personalización completa y es compatible con Vue 3 a través de composables personalizados.
+### Análisis Inteligente con Gemini AI
 
+MoneyLink integra el modelo **Gemini 2.0 Flash** de Google para proporcionar análisis inteligente de las tasas de cambio. A través del composable `useExchangeChartAI.js`, la aplicación:
+
+- **Analiza datos en tiempo real**: Evalúa tendencias, volatilidad y promedios históricos de tasas de cambio
+- **Genera recomendaciones**: Proporciona respuestas claras sobre si es un buen momento para enviar dinero
+- **Incluye fallback local**: Si falla la conexión a la API, genera análisis local basado en algoritmos
+- **Extrae métricas clave**: 
+  - Tasa actual vs. tasa anterior
+  - Tendencia (alcista, bajista o estable)
+  - Rango de volatilidad
+  - Tasa promedio del período
+  
+La IA evalúa estos parámetros y proporciona un análisis profesional en lenguaje natural, ayudando a los usuarios a tomar decisiones informadas sobre cuándo realizar sus transferencias internacionales.
 ## Instalación y Configuración
 
 ### Requisitos Previos
