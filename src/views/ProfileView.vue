@@ -39,17 +39,17 @@ const validateForm = () => {
   errors.value = {}
   
   if (!profileForm.value.fullName || profileForm.value.fullName.length < 2) {
-    errors.value.fullName = 'El nombre debe tener al menos 2 caracteres'
+    errors.value.fullName = 'Name must be at least 2 characters long'
   }
   
   if (!profileForm.value.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileForm.value.email)) {
-    errors.value.email = 'Email válido es requerido'
+    errors.value.email = 'Valid email is required'
   }
   
   if (!profileForm.value.phone) {
-    errors.value.phone = 'El teléfono es requerido'
+    errors.value.phone = 'Phone number is required'
   } else if (!/^\+?[\d\s-]{8,}$/.test(profileForm.value.phone)) {
-    errors.value.phone = 'Formato de teléfono inválido'
+    errors.value.phone = 'Invalid phone format'
   }
   
   return Object.keys(errors.value).length === 0
@@ -65,10 +65,10 @@ const handleSubmit = async () => {
   
   try {
     await authService.updateProfile(profileForm.value)
-    successMessage.value = 'Perfil actualizado correctamente'
+    successMessage.value = 'Profile updated successfully'
     currentUser.value = authService.getCurrentUser()
   } catch (error) {
-    errorMessage.value = error.message || 'Error al actualizar el perfil'
+    errorMessage.value = error.message || 'Error updating profile'
   } finally {
     isLoading.value = false
   }
@@ -84,10 +84,10 @@ const handleCancel = () => {
     <div class="profile-card">
       <div class="profile-header">
         <button class="back-btn" @click="handleCancel">
-          ← Volver
+          ← Back
         </button>
-        <h1>Editar Perfil</h1>
-        <p class="subtitle">Actualiza tu información personal</p>
+        <h1>Edit Profile</h1>
+        <p class="subtitle">Update your personal information</p>
       </div>
 
       <div v-if="successMessage" class="alert alert-success">
@@ -100,12 +100,12 @@ const handleCancel = () => {
 
       <form @submit.prevent="handleSubmit" class="profile-form">
         <div class="form-group">
-          <label for="profile-name">Nombre Completo</label>
+          <label for="profile-name">Full Name</label>
           <input
             id="profile-name"
             v-model="profileForm.fullName"
             type="text"
-            placeholder="Tu nombre completo"
+            placeholder="Your full name"
             :class="{ 'input-error': errors.fullName }"
           />
           <span v-if="errors.fullName" class="error-text">{{ errors.fullName }}</span>
@@ -117,42 +117,42 @@ const handleCancel = () => {
             id="profile-email"
             v-model="profileForm.email"
             type="email"
-            placeholder="tu@email.com"
+            placeholder="your@email.com"
             :class="{ 'input-error': errors.email }"
             disabled
           />
-          <span class="help-text">El email no se puede modificar</span>
+          <span class="help-text">Email cannot be changed</span>
           <span v-if="errors.email" class="error-text">{{ errors.email }}</span>
         </div>
 
         <div class="form-group">
-          <label for="profile-phone">Teléfono</label>
+          <label for="profile-phone">Phone Number</label>
           <input
             id="profile-phone"
             v-model="profileForm.phone"
             type="tel"
-            placeholder="+34 600 123 456"
+            placeholder="+1 (555) 123-4567"
             :class="{ 'input-error': errors.phone }"
           />
           <span v-if="errors.phone" class="error-text">{{ errors.phone }}</span>
         </div>
 
         <div class="form-group">
-          <label for="profile-address">Dirección (Opcional)</label>
+          <label for="profile-address">Address (Optional)</label>
           <input
             id="profile-address"
             v-model="profileForm.address"
             type="text"
-            placeholder="Tu dirección"
+            placeholder="Your address"
           />
         </div>
 
         <div class="form-actions">
           <button type="button" class="cancel-button" @click="handleCancel">
-            Cancelar
+            Cancel
           </button>
           <button type="submit" class="submit-button" :disabled="isLoading">
-            {{ isLoading ? 'Guardando...' : 'Guardar Cambios' }}
+            {{ isLoading ? 'Saving...' : 'Save Changes' }}
           </button>
         </div>
       </form>

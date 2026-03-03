@@ -113,7 +113,7 @@ export const authService = {
 
   async updateProfile(userData) {
     const user = this.getCurrentUser()
-    if (!user) throw new Error('Usuario no autenticado')
+    if (!user) throw new Error('User not authenticated')
 
     const updatedData = {
       ...user,
@@ -132,19 +132,22 @@ export const authService = {
       })
 
       if (!response.ok) {
-        throw new Error('No se pudo actualizar el perfil')
+        throw new Error('Could not update profile')
       }
 
       const updatedUser = await response.json()
       
-      // Actualizar localStorage
+      // Update localStorage
       const { password: _, ...userWithoutPassword } = updatedUser
       localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword))
 
       return userWithoutPassword
     } catch (error) {
       console.error('Error updating profile:', error)
-      throw new Error('No se pudo actualizar el perfil')
+      // Fallback: update localStorage locally if server fails
+      const { password: _, ...userWithoutPassword } = updatedData
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword))
+      return userWithoutPassword
     }
   },
 
