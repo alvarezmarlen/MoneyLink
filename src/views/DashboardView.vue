@@ -7,15 +7,11 @@ import { transactionService } from '../services/transactionService'
 import TransactionCard from '../components/TransactionCard.vue'
 import HistoryList from '../components/HistoryList.vue'
 import RecipientQuickList from '../components/RecipientQuickList.vue'
-import { useExchangeChart } from '../composables/useExchangeChart'
 
 const emit = defineEmits(['auth-change'])
 
 const router = useRouter()
 const route = useRoute()
-
-// Exchange chart composable
-const { chartCanvas, initChart, chartData } = useExchangeChart()
 
 const currentUser = ref(null)
 const currentTransaction = ref(null)
@@ -45,36 +41,10 @@ const loadData = async () => {
     isLoadingRecipients.value = false
   }
   
-  recentTransactions.value = transactionService.getRecentTransactions(5)
-  
-  // Initialize exchange rate chart
-  loadExchangeRateChart()
+  recentTransactions.value = await transactionService.getRecentTransactions(5)
 }
 
-// Generate mock exchange rate data for demonstration
-const loadExchangeRateChart = () => {
-  const labels = []
-  const dataPoints = []
-  const baseRate = 0.92
-  
-  // Generate data for the last 30 days
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date()
-    date.setDate(date.getDate() - i)
-    labels.push(date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }))
-    
-    // Generate realistic mock data with slight variations
-    const variation = (Math.random() - 0.5) * 0.02
-    dataPoints.push(baseRate + variation)
-  }
-  
-  initChart(
-    labels,
-    dataPoints,
-    'Evolución USD/EUR - Últimos 30 días',
-    'USD/EUR'
-  )
-}
+
 
 onMounted(loadData)
 
@@ -178,20 +148,6 @@ const handleLogout = () => {
     </div>
     
     <div class="dashboard-content">
-      <!-- Exchange Rate Chart -->
-      <section class="dashboard-section chart-section">
-        <h2 class="section-title">
-          <span class="title-icon">📈</span>
-          Análisis de Tipo de Cambio
-        </h2>
-        <div class="chart-container">
-          <canvas ref="chartCanvas"></canvas>
-        </div>
-        <div v-if="chartData.hasError" class="chart-error">
-          Error al cargar el gráfico: {{ chartData.errorMessage }}
-        </div>
-      </section>
-      
       <section v-if="currentTransaction" class="dashboard-section current-tx">
         <h2 class="section-title">
           <span class="title-icon">⏳</span>
@@ -336,30 +292,6 @@ const handleLogout = () => {
 
 .title-icon {
   font-size: 1.25rem;
-}
-
-.chart-section {
-  background: var(--bg-secondary);
-}
-
-.chart-container {
-  width: 100%;
-  height: 320px;
-  position: relative;
-}
-
-.chart-container canvas {
-  max-height: 320px;
-}
-
-.chart-error {
-  padding: 16px;
-  background: rgba(255, 68, 68, 0.1);
-  border: 1px solid rgba(255, 68, 68, 0.3);
-  border-radius: 8px;
-  color: #ff4444;
-  margin-top: 16px;
-  font-size: 0.875rem;
 }
 
 .current-tx {
