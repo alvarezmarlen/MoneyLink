@@ -65,6 +65,13 @@ export const transactionService = {
       userId: String(user.id),
       amount: Number(transaction.amount),
       convertedAmount: Number(transaction.convertedAmount),
+      sender: transaction.sender ? {
+        fullName: transaction.sender.fullName,
+        idNumber: transaction.sender.idNumber,
+        phone: transaction.sender.phone,
+        email: transaction.sender.email,
+        address: transaction.sender.address
+      } : undefined,
       createdAt: transaction.createdAt || new Date().toISOString(),
       status: 'completed'
     }
