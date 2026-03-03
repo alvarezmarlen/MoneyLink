@@ -1,0 +1,89 @@
+/* Variables de tema globales */
+:root {
+  /* Dark mode colors (default) */
+  --bg-primary: #020b08;
+  --bg-secondary: #0a1f1a;
+  --bg-tertiary: #112a24;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0A0;
+  --text-tertiary: #5a6a65;
+  --border-color: #1a2e29;
+  --accent-color: #00E676;
+  --accent-hover: #00C853;
+  --input-bg: #0f2420;
+  --input-border: #1a3a35;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] {
+  --bg-primary: #F5F5F5;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F0F0F0;
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --border-color: #E0E0E0;
+  --accent-color: #00C853;
+  --accent-hover: #00B348;
+  --input-bg: #FFFFFF;
+  --input-border: #D0D0D0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* Estilos para inputs */
+input, select, textarea {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--input-border);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Estilos para botones con tema */
+button {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Estilos para links */
+a {
+  transition: color 0.2s ease;
+}
+
+/* Scrollbar con tema */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}

@@ -5,6 +5,11 @@
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vite App</title>
+    <script>
+      // Establecer el tema inicial antes de que Vue renderice la aplicación
+      const theme = localStorage.getItem('theme') || 'dark'
+      document.documentElement.setAttribute('data-theme', theme)
+    </script>
   </head>
   <body>
     <div id="app"></div>
