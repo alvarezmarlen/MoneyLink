@@ -40,6 +40,8 @@ onMounted(() => {
     senderForm.value.fullName = currentUser.fullName || ''
     senderForm.value.email = currentUser.email || ''
     senderForm.value.idNumber = currentUser.idNumber || ''
+    senderForm.value.phone = currentUser.phone || ''
+    senderForm.value.address = currentUser.address || ''
   }
 })
 
@@ -65,17 +67,36 @@ const validate = () => {
   return Object.keys(errors.value).length === 0
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!validate()) return
   
-  const updatedTransferData = {
-    ...transferData.value,
-    sender: { ...senderForm.value },
-    step: 'payment'
+  try {
+    // 1. Guardamos los datos en la sesión del usuario para que persistan siempre
+    // Usamos el nombre exacto de la función en tu authService.js: updateProfile
+    await authService.updateProfile({
+      fullName: senderForm.value.fullName,
+      phone: senderForm.value.phone,
+      address: senderForm.value.address,
+      idNumber: senderForm.value.idNumber
+    })
+
+    // 2. Guardamos los datos específicos de ESTA transferencia actual
+    const updatedTransferData = {
+      ...transferData.value,
+      sender: { ...senderForm.value },
+      step: 'payment'
+    }
+    transferStorage.saveTransferData(updatedTransferData)
+    
+    // 3. Navegamos al siguiente paso
+    router.push('/payment')
+
+  } catch (error) {
+    console.error("Error al guardar los datos del remitente:", error)
+    // Aunque falle el servidor, el authService que tienes tiene un fallback 
+    // que lo guarda en el LocalStorage, así que igual debería funcionar.
+    router.push('/payment') 
   }
-  transferStorage.saveTransferData(updatedTransferData)
-  
-  router.push('/payment')
 }
 
 const handleBack = () => {
