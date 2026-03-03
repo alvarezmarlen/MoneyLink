@@ -62,6 +62,7 @@ export const transactionService = {
 
     const newTransaction = {
       ...transaction,
+      id: transaction.id || String(Date.now()),
       userId: String(user.id),
       amount: Number(transaction.amount),
       convertedAmount: Number(transaction.convertedAmount),
