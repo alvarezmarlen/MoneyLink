@@ -44,25 +44,25 @@ const validate = () => {
   errors.value = {}
   
   if (!form.value.fullName || form.value.fullName.length < 2) {
-    errors.value.fullName = 'Name must be at least 2 characters long'
+    errors.value.fullName = 'El nombre debe tener al menos 2 caracteres'
   }
   
   if (!form.value.country) {
-    errors.value.country = 'Select a country'
+    errors.value.country = 'Selecciona un país'
   }
   
   if (!form.value.accountNumber) {
-    errors.value.accountNumber = 'Account number is required'
+    errors.value.accountNumber = 'El número de cuenta es requerido'
   }
   
   if (!form.value.phone) {
-    errors.value.phone = 'Phone number is required'
+    errors.value.phone = 'El teléfono es requerido'
   } else if (!/^\+?[\d\s-]{8,}$/.test(form.value.phone)) {
-    errors.value.phone = 'Invalid phone format'
+    errors.value.phone = 'Formato de teléfono inválido'
   }
   
   if (form.value.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
-    errors.value.email = 'Invalid email format'
+    errors.value.email = 'Formato de email inválido'
   }
   
   return Object.keys(errors.value).length === 0

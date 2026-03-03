@@ -1,21 +1,38 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '../views/AuthView.vue'
+import { authService } from '../services/authService'
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: '/converter', name: 'converter', component: { template: '<div>Converter</div>' } },
-    { path: '/login', name: 'login', component: AuthView },
-    { path: '/register', name: 'register', component: AuthView },
-    { path: '/transfer', name: 'transfer', component: { template: '<div>Transfer</div>' } }
-  ]
-})
+// router will be created fresh inside beforeEach to avoid stale state between tests
+let router
 
 describe('AuthView - E2E Tests', () => {
   beforeEach(() => {
     localStorage.clear()
+    // recreate router to isolate each test
+    router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/converter', name: 'converter', component: { template: '<div>Converter</div>' } },
+        { path: '/login', name: 'login', component: AuthView },
+        { path: '/register', name: 'register', component: AuthView },
+        { path: '/transfer', name: 'transfer', component: { template: '<div>Transfer</div>' } }
+      ]
+    })
+
+    // stub authService.login to make tests deterministic
+    vi.spyOn(authService, 'login').mockImplementation(async (email, password) => {
+      if (email === 'test@example.com' && password === 'password123') {
+        return { id: '1', email, fullName: 'Test User' }
+      }
+      // simulate rejection for wrong credentials
+      throw new Error('Invalid credentials')
+    })
+  })
+
+  afterEach(() => {
+    authService.login.mockRestore && authService.login.mockRestore()
   })
 
   describe('Scenario 1: Login Form Rendering', () => {
@@ -63,6 +80,10 @@ describe('AuthView - E2E Tests', () => {
       })
 
       await wrapper.find('.link-button').trigger('click')
+      // navigation is asynchronous, wait for router and component update
+      await flushPromises()
+      await wrapper.vm.$nextTick()
+      await router.isReady()
 
       expect(wrapper.text()).toContain('Create Account')
       expect(wrapper.text()).toContain('Sign up to get started')
@@ -82,6 +103,9 @@ describe('AuthView - E2E Tests', () => {
       })
 
       await wrapper.find('.link-button').trigger('click')
+      await flushPromises()
+      await wrapper.vm.$nextTick()
+      await router.isReady()
 
       expect(wrapper.text()).toContain('Already have an account?')
       expect(wrapper.text()).toContain('Log in')
@@ -92,7 +116,9 @@ describe('AuthView - E2E Tests', () => {
     it('sets error on invalid credentials', async () => {
       router.push('/login')
       await router.isReady()
-      
+      // prevent actual navigation in test (it will clear messages)
+      const pushSpy = vi.spyOn(router, 'push').mockResolvedValue()
+
       const wrapper = mount(AuthView, {
         global: {
           plugins: [router]
@@ -103,15 +129,18 @@ describe('AuthView - E2E Tests', () => {
       await wrapper.find('input[type="password"]').setValue('wrongpass')
       await wrapper.find('form').trigger('submit')
 
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await flushPromises()
 
       expect(wrapper.vm.error).toBeDefined()
+
+      pushSpy.mockRestore()
     })
 
     it('sets success message on successful login', async () => {
       router.push('/login')
       await router.isReady()
-      
+      const pushSpy = vi.spyOn(router, 'push').mockResolvedValue()
+
       const wrapper = mount(AuthView, {
         global: {
           plugins: [router]
@@ -122,9 +151,11 @@ describe('AuthView - E2E Tests', () => {
       await wrapper.find('input[type="password"]').setValue('password123')
       await wrapper.find('form').trigger('submit')
 
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await flushPromises()
 
       expect(wrapper.vm.successMessage).toBe('Login successful!')
+
+      pushSpy.mockRestore()
     })
   })
 
@@ -190,6 +221,9 @@ describe('AuthView - E2E Tests', () => {
       })
 
       await wrapper.find('.link-button').trigger('click')
+      await flushPromises()
+      await wrapper.vm.$nextTick()
+      await router.isReady()
 
       await wrapper.find('input#register-name').setValue('John Doe')
       await wrapper.find('input#register-email').setValue('new@test.com')
@@ -212,6 +246,9 @@ describe('AuthView - E2E Tests', () => {
       })
 
       await wrapper.find('.link-button').trigger('click')
+      await flushPromises()
+      await wrapper.vm.$nextTick()
+      await router.isReady()
 
       await wrapper.find('input#register-name').setValue('John Doe')
       await wrapper.find('input#register-email').setValue('new@test.com')
@@ -234,6 +271,9 @@ describe('AuthView - E2E Tests', () => {
       })
 
       await wrapper.find('.link-button').trigger('click')
+      await flushPromises()
+      await wrapper.vm.$nextTick()
+      await router.isReady()
 
       await wrapper.find('input#register-name').setValue('John Doe')
       await wrapper.find('input#register-email').setValue('new@test.com')

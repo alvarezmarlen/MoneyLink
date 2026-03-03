@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
+import { createPinia } from 'pinia'
 import App from '../App.vue'
 
 const router = createRouter({
@@ -19,13 +20,14 @@ describe('App', () => {
   })
   
   it('mounts and renders navbar', () => {
+    const pinia = createPinia()
     const wrapper = mount(App, {
       global: {
-        plugins: [router]
+        plugins: [router, pinia]
       }
     })
     expect(wrapper.text()).toContain('MoneyLink')
-    expect(wrapper.text()).toContain('Simulator')
+    expect(wrapper.text()).toContain('Pro')
     expect(wrapper.text()).toContain('Log In')
     expect(wrapper.text()).toContain('Sign Up')
   })

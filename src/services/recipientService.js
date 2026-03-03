@@ -4,6 +4,32 @@ const API_URL = 'http://localhost:3000/recipients'
 const LOCAL_STORAGE_KEY = 'moneylink_recipients'
 
 export const recipientService = {
+  // basic validation helper used by tests
+  validateRecipient(data) {
+    const errors = {}
+    if (!data.fullName || data.fullName.length < 2) {
+      errors.fullName = 'Full name must be at least 2 characters'
+    }
+    if (!data.country) {
+      errors.country = 'Select a country'
+    }
+    if (!data.accountNumber) {
+      errors.accountNumber = 'Account number is required'
+    }
+    if (!data.phone) {
+      errors.phone = 'Phone number is required'
+    } else if (!/^\+?[\d\s-]{8,}$/.test(data.phone)) {
+      errors.phone = 'Invalid phone format'
+    }
+    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      errors.email = 'Invalid email format'
+    }
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    }
+  },
+
   _getLocalRecipients(userId) {
     const data = localStorage.getItem(`${LOCAL_STORAGE_KEY}_${userId}`)
     return data ? JSON.parse(data) : []

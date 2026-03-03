@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import RecipientForm from '../components/RecipientForm.vue'
 
 describe('RecipientForm.vue - E2E Tests', () => {
@@ -88,6 +88,7 @@ describe('RecipientForm.vue - E2E Tests', () => {
     await wrapper.find('input[type="checkbox"]').setChecked()
     
     await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
     
     expect(wrapper.emitted('submit')).toBeTruthy()
     const emittedData = wrapper.emitted('submit')[0][0]
@@ -98,11 +99,14 @@ describe('RecipientForm.vue - E2E Tests', () => {
   
   it('submits form without saving as frequent', async () => {
     await wrapper.find('#recipient-name').setValue('Maria Garcia')
-    await wrapper.find('#recipient-country').setValue('MX')
+    await wrapper.find('#recipient-country').setValue('MXN')
     await wrapper.find('#recipient-account').setValue('987654321')
     await wrapper.find('#recipient-phone').setValue('+52 55 1234 5678')
-    
+    // allow v-model updates to propagate
+    await wrapper.vm.$nextTick()
+
     await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
     
     expect(wrapper.emitted('submit')).toBeTruthy()
     const emittedData = wrapper.emitted('submit')[0][0]
