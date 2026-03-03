@@ -86,6 +86,7 @@ export const currencyService = {
             const labels = [];
             const dataPoints = [];
             const baseRate = await this.getExchangeRate(from, to);
+
             if (!baseRate) {
                 return { labels: [], dataPoints: [] };
             }

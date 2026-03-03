@@ -114,6 +114,63 @@ export const recipientService = {
     } catch (error) {
       console.error('Error al eliminar en API')
     }
+  },
+
+  async getRecipientById(id) {
+    const user = authService.getCurrentUser()
+    if (!user) return null
+
+    try {
+      // Intentar obtener de la API
+      const response = await fetch(`${API_URL}/${id}`)
+      if (response.ok) {
+        const recipient = await response.json()
+        if (recipient.userId === String(user.id)) {
+          return recipient
+        }
+      }
+    } catch (error) {
+      console.warn('Error al obtener destinatario de API, buscando en local')
+    }
+
+    // Buscar en local storage
+    const localRecipients = this._getLocalRecipients(user.id)
+    return localRecipients.find(r => r.id === id) || null
+  },
+
+  async updateRecipient(id, data) {
+    const user = authService.getCurrentUser()
+    if (!user) throw new Error('Usuario no autenticado')
+
+    const updatedData = {
+      ...data,
+      userId: String(user.id),
+      updatedAt: new Date().toISOString()
+    }
+
+    // 1. Actualizar localmente primero
+    const localRecipients = this._getLocalRecipients(user.id)
+    const existingIdx = localRecipients.findIndex(r => r.id === id)
+
+    if (existingIdx >= 0) {
+      localRecipients[existingIdx] = { ...localRecipients[existingIdx], ...updatedData }
+      this._saveLocalRecipients(user.id, localRecipients)
+    }
+
+    // 2. Intentar actualizar en la API
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      })
+      
+      if (!response.ok) throw new Error('Error al actualizar en API')
+      return await response.json()
+    } catch (error) {
+      console.warn('Destinatario actualizado solo localmente')
+      return { id, ...updatedData }
+    }
   }
 }
 

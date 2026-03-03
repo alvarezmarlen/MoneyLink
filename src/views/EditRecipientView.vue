@@ -40,13 +40,13 @@ const handleSubmit = async (data) => {
   
   try {
     await recipientService.updateRecipient(recipient.value.id, data)
-    successMessage.value = 'Destinatario actualizado correctamente'
+    successMessage.value = 'Recipient updated successfully'
     
     setTimeout(() => {
       router.push('/dashboard')
     }, 1500)
   } catch (error) {
-    errorMessage.value = error.message || 'Error al actualizar el destinatario'
+    errorMessage.value = error.message || 'Error updating recipient'
   } finally {
     isLoading.value = false
   }
@@ -62,10 +62,10 @@ const handleCancel = () => {
     <div class="edit-recipient-card">
       <div class="edit-header">
         <button class="back-btn" @click="handleCancel">
-          ← Volver
+          ← Back
         </button>
-        <h1>Editar Destinatario</h1>
-        <p class="subtitle">Actualiza la información del destinatario</p>
+        <h1>Edit Recipient</h1>
+        <p class="subtitle">Update recipient information</p>
       </div>
 
       <div v-if="successMessage" class="alert alert-success">
@@ -85,7 +85,7 @@ const handleCancel = () => {
       </div>
 
       <div v-else class="loading">
-        <p>Cargando...</p>
+        <p>Loading...</p>
       </div>
     </div>
   </div>

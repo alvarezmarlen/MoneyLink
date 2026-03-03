@@ -34,8 +34,8 @@ const handleDelete = (recipient, event) => {
   <div class="recipient-list">
     <div v-if="recipients.length === 0" class="empty-state">
       <span class="empty-icon">👥</span>
-      <p class="empty-text">Sin destinatarios guardados</p>
-      <p class="empty-subtext">Guarda destinatarios frecuentes al realizar transferencias</p>
+      <p class="empty-text">No saved recipients</p>
+      <p class="empty-subtext">Save frequent recipients when making transfers</p>
     </div>
     
     <div v-else class="recipients-grid">
@@ -50,11 +50,11 @@ const handleDelete = (recipient, event) => {
           <span class="name">{{ recipient.fullName }}</span>
           <span class="country">{{ getCountryName(recipient.country) }}</span>
         </div>
-        <div class="action-buttons">
-          <button class="edit-btn" @click="handleEdit(recipient, $event)" title="Editar">
+        <div class="action-buttons" @click.stop>
+          <button class="edit-btn" @click="handleEdit(recipient, $event)" title="Edit">
             ✏️
           </button>
-          <button class="delete-btn" @click="handleDelete(recipient, $event)" title="Eliminar">
+          <button class="delete-btn" @click="handleDelete(recipient, $event)" title="Delete">
             🗑️
           </button>
         </div>
@@ -80,13 +80,13 @@ const handleDelete = (recipient, event) => {
 }
 
 .empty-text {
-  color: #A0A0A0;
+  color: var(--text-secondary);
   font-size: 0.9375rem;
   margin: 0 0 4px 0;
 }
 
 .empty-subtext {
-  color: #5a6a65;
+  color: var(--text-tertiary);
   font-size: 0.8125rem;
   margin: 0;
 }
@@ -101,18 +101,18 @@ const handleDelete = (recipient, event) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(10, 31, 26, 0.5);
-  border: 1px solid #1a2e29;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 12px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 180px;
+  min-width: 200px;
   position: relative;
 }
 
 .recipient-chip:hover {
-  border-color: #00E676;
+  border-color: var(--accent-color);
   background: rgba(0, 230, 118, 0.05);
   transform: translateY(-2px);
 }
@@ -120,6 +120,7 @@ const handleDelete = (recipient, event) => {
 .avatar {
   width: 40px;
   height: 40px;
+  min-width: 40px;
   border-radius: 50%;
   background: linear-gradient(135deg, #00FF85 0%, #00E676 100%);
   color: #000000;
@@ -135,60 +136,67 @@ const handleDelete = (recipient, event) => {
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
 .name {
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-size: 0.9375rem;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .country {
-  color: #5a6a65;
+  color: var(--text-tertiary);
   font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.edit-btn {
-  position: absolute;
-  top: 8px;
-  right: 40px;
-  background: rgba(10, 31, 26, 0.8);
-  border: 1px solid #1a2e29;
-  border-radius: 6px;
-  padding: 4px 6px;
-  font-size: 0.75rem;
-  cursor: pointer;
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
-.delete-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(10, 31, 26, 0.8);
-  border: 1px solid #1a2e29;
-  border-radius: 6px;
-  padding: 4px 6px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  opacity: 0;
-  transition: all 0.2s ease;
-}
-
-.recipient-chip:hover .edit-btn,
-.recipient-chip:hover .delete-btn {
+.recipient-chip:hover .action-buttons {
   opacity: 1;
+}
+
+.edit-btn,
+.delete-btn {
+  background: rgba(10, 31, 26, 0.9);
+  border: 1px solid #1a2e29;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
 }
 
 .edit-btn:hover {
   background: rgba(0, 230, 118, 0.2);
   border-color: #00E676;
+  transform: scale(1.05);
 }
 
 .delete-btn:hover {
   background: rgba(255, 71, 87, 0.2);
   border-color: #ff6b7a;
+  transform: scale(1.05);
 }
 
 @media (max-width: 480px) {
@@ -198,6 +206,19 @@ const handleDelete = (recipient, event) => {
   
   .recipient-chip {
     width: 100%;
+    min-width: unset;
+  }
+  
+  .action-buttons {
+    opacity: 1;
+  }
+  
+  .edit-btn,
+  .delete-btn {
+    min-width: 28px;
+    height: 28px;
+    padding: 4px 6px;
+    font-size: 0.75rem;
   }
 }
 </style>
