@@ -1,6 +1,6 @@
 import { authService } from './authService'
 
-const API_URL = 'http://localhost:3000/recipients'
+const API_URL = 'https://moneylink.onrender.com/recipients'
 const LOCAL_STORAGE_KEY = 'moneylink_recipients'
 
 export const recipientService = {
