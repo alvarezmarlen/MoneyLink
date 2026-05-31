@@ -1,7 +1,7 @@
 const STORAGE_KEY = 'moneylink_auth'
 const TRANSFER_DATA_KEY = 'moneylink_transfer_data'
 const OFFLINE_USERS_KEY = 'moneylink_offline_users'
-const API_URL = 'http://localhost:3000/users'
+const API_URL = 'https://moneylink.onrender.com/users'
 
 export const authService = {
   // offline list helpers
